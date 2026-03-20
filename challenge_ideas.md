@@ -95,4 +95,4 @@ The data is yours. Some prompts if you want to go your own direction:
 - **`LATERAL FLATTEN`** unpacks genre and production_countries arrays
 - **Semi-structured data** (cc_title, cc_clickout, cc_yauaa) uses colon notation: `cc_title:jwEntityId::TEXT`
 - **Snowflake Cortex** is available on this account for AI/ML experiments
-- **Lightdash** is connected to your team's database — use it for dashboards and visualisations (see [access/lightdash.md](../access/lightdash.md) for setup)
+- **Lightdash** is connected to your team's database — use it for dashboards and visualisations (see [platforms/lightdash/](platforms/lightdash/) for setup)

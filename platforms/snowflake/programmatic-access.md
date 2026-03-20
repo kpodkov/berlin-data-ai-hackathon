@@ -22,7 +22,7 @@ Verify: `snow --version`
 
 ```bash
 mkdir -p ~/.snowflake
-cp access/snowflake/connections.toml ~/.snowflake/connections.toml
+cp platforms/snowflake/connections.toml ~/.snowflake/connections.toml
 ```
 
 2. Edit `~/.snowflake/connections.toml` — fill in your email, password, and team number:

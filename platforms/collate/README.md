@@ -14,9 +14,8 @@
 - Search for tables and columns across the data
 - Add your own documentation and tags during the hackathon
 
-## Vendor resources
+## Resources
 
-- [Collate resources for Hackathon Attendees](resources/collate_resources.pdf)
 - [Interactive feature demos](https://www.getcollate.io/learning-center/resource/demos)
 - [Tutorials](https://www.getcollate.io/learning-center/resource/tutorials)
 - [Sandbox access](https://www.getcollate.io/welcome)
