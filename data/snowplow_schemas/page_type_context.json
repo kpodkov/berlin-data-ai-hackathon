@@ -1,0 +1,46 @@
+{
+  "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+  "description": "Context tracking the page type and user's locale settings. Attached to every event.",
+  "self": {
+    "vendor": "com.justwatch",
+    "name": "page_type_context",
+    "format": "jsonschema",
+    "version": "1-1-0"
+  },
+  "type": "object",
+  "properties": {
+    "pageType": {
+      "description": "Type of page the user was on when the event fired. Examples: \"title_detail\", \"home\", \"popular\", \"search\", \"onboarding\", \"new\", \"watchlist\".",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100
+    },
+    "appLocale": {
+      "description": "The user's selected country/market setting (ISO 3166-1 alpha-2 code, uppercase). Examples: \"DE\", \"GB\", \"FR\", \"US\". This is the market the user chose in their settings — NOT the same as geo_country (which is IP-based physical location). A user in Germany may have appLocale set to \"GB\" if they browse UK content.",
+      "type": ["string", "null"],
+      "minLength": 2,
+      "maxLength": 5
+    },
+    "appLanguage": {
+      "description": "The user's selected UI language (ISO 639-1 code). Examples: \"en\", \"de\", \"fr\". Controls which language the JustWatch interface is displayed in.",
+      "type": ["string", "null"],
+      "minLength": 2,
+      "maxLength": 6
+    },
+    "pageViewUuid": {
+      "description": "UUID linking this event to its parent page view event. All events that happen on the same page share the same pageViewUuid. Use to group events by page visit.",
+      "type": ["string", "null"],
+      "minLength": 36,
+      "maxLength": 36
+    },
+    "pageEntryMode": {
+      "description": "How the user arrived at this page. Values: \"seo\" (from search engine), \"direct\" (typed URL or bookmark), \"navigation\" (internal link), \"back\" (browser back), \"middle click\" (opened in new tab). Default: \"direct\".",
+      "default": "direct",
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 100
+    }
+  },
+  "required": ["pageType"],
+  "additionalProperties": true
+}

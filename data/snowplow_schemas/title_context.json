@@ -1,0 +1,34 @@
+{
+  "description": "Context attached to events related to a specific piece of content (movie, show, season, or episode). Always present on title-related events.",
+  "properties": {
+    "titleId": {
+      "type": "integer",
+      "description": "Numeric title identifier. For movies: the movie ID. For shows/seasons/episodes: the parent show ID. Use jwEntityId for the prefixed version that joins to the objects table."
+    },
+    "objectType": {
+      "type": "string",
+      "description": "Content type. Values: \"movie\", \"show\", \"show_season\", \"show_episode\". Use with seasonNumber and episodeNumber to identify the exact content."
+    },
+    "jwEntityId": {
+      "type": "string",
+      "description": "Title identifier with type prefix (tm = movie, ts = show). Always refers to the top-level title, even for season/episode events. Join to objects: cc_title:jwEntityId::TEXT = objects.object_id."
+    },
+    "jwRawEntityId": {
+      "type": ["string", "null"],
+      "description": "Most granular object identifier with prefix: tm = movie, ts = show, tss = season, tse = episode. For episode events, gives the specific episode/season ID. ~38% fill rate."
+    },
+    "seasonNumber": {
+      "type": ["integer", "null"],
+      "description": "Season number (1, 2, 3...). Present for season/episode events (~15% of all events). NULL for movies."
+    },
+    "episodeNumber": {
+      "type": ["integer", "null"],
+      "description": "Episode number within the season. Present for episode events (~13%). NULL for movies and show-level events."
+    },
+    "index": {
+      "type": ["integer", "null"],
+      "description": "Position of the title in a list or carousel (0-based). Present when the event originates from a list context (~11%). NULL otherwise."
+    }
+  },
+  "required": ["titleId", "objectType", "jwEntityId"]
+}

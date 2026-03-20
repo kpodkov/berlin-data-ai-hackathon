@@ -1,0 +1,29 @@
+{
+    "description": "Context attached to search-related events (e.g. search_suggest_click). Contains the search query text and session information. Use cc_search:searchEntry::TEXT to see what the user typed.",
+    "properties": {
+        "sessionUuid": {
+            "description": "Unique identifier for this search session. A search session starts when the user opens the search box and ends when they close it or navigate away. Use to group all search interactions within one search attempt.",
+            "type": "string",
+            "maxLength": 100
+        },
+        "prevSessionUuid": {
+            "description": "UUID of the previous search session, if the user searched multiple times in sequence. NULL if this is the first search session or the previous one is unknown.",
+            "type": ["string", "null"],
+            "maxLength": 100
+        },
+        "searchEntry": {
+            "description": "The current text in the search input at the time of the event. This is what the user typed before clicking on a search suggestion. For example: \"stranger th\" if they clicked the suggestion for Stranger Things after typing 10 characters.",
+            "type": ["string", "null"],
+            "maxLength": 255
+        },
+        "searchEntries": {
+            "type": ["array", "null"],
+            "description": "History of search strings from the current session, most recent first. If the user typed \"strang\", then refined to \"stranger things\", the array would be [\"stranger things\", \"strang\"]. Useful for understanding search refinement behaviour.",
+            "items": {
+                "type": "string",
+                "maxLength": 255
+            }
+        }
+    },
+    "required": ["sessionUuid"]
+}

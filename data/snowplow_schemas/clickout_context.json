@@ -1,0 +1,50 @@
+{
+  "description": "Context attached to clickout events — when a user clicks through to a streaming provider to watch, rent, or buy content. Present on se_category='clickout' events only.",
+  "properties": {
+    "providerId": {
+      "type": "integer",
+      "description": "Streaming provider ID. Join to packages table: cc_clickout:providerId::NUMBER = packages.id. Always present."
+    },
+    "provider": {
+      "type": ["string", "null"],
+      "description": "Provider display name (e.g. \"Netflix\", \"Amazon Prime Video\"). Same value as se_label on clickout events."
+    },
+    "monetizationType": {
+      "type": "string",
+      "description": "How the content is monetised. Values: \"flatrate\" (subscription), \"free\" (ad-supported), \"rent\", \"buy\", \"cinema\", \"ads\", \"sports\"."
+    },
+    "presentationType": {
+      "type": "string",
+      "description": "Video quality/format. Values: \"hd\", \"sd\", \"4k\", \"bluray\"."
+    },
+    "clickoutType": {
+      "type": ["string", "null"],
+      "description": "Type of clickout offer. Values: \"regular\", \"promoted\", \"free_trial\", \"qtv\". ~96% fill rate."
+    },
+    "placement": {
+      "type": ["string", "null"],
+      "description": "Where on the page the clickout was shown. Values: \"banner_buybox\", \"promoted_buybox\", \"backdrop\", \"search_page\", etc. ~97% fill rate."
+    },
+    "currency": {
+      "type": ["string", "null"],
+      "description": "ISO 4217 currency code (e.g. \"EUR\", \"USD\", \"GBP\"). ~70% fill rate."
+    },
+    "country": {
+      "type": ["string", "null"],
+      "description": "ISO 3166-1 country code for this offer (e.g. \"DE\", \"GB\"). ~52% fill rate."
+    },
+    "filterOption": {
+      "type": ["string", "null"],
+      "description": "Active filter tab in the offers section (e.g. \"stream\", \"rent\", \"buy\"). ~68% fill rate."
+    },
+    "rowNumber": {
+      "type": ["integer", "null"],
+      "description": "Row position of this offer in the offers section (0-based). ~78% fill rate."
+    },
+    "noOffer": {
+      "type": ["boolean", "null"],
+      "description": "True if the title page had no active streaming offer. ~72% fill rate."
+    }
+  },
+  "required": ["monetizationType", "presentationType", "providerId"]
+}
