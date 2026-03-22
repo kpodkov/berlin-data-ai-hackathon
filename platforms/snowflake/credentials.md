@@ -9,8 +9,8 @@
 You can connect via:
 
 - **Snowsight** — Snowflake's web UI (recommended for getting started). Go to the account URL and log in.
-- **Snow CLI** — Snowflake's command-line tool. See [cli.md](cli.md) for setup and usage.
-- **Python** — `snowflake-connector-python` or `snowflake-sqlalchemy`. See [cli.md](cli.md#python) for examples.
+- **Snow CLI** — Snowflake's command-line tool. See [programmatic-access.md](programmatic-access.md) for setup and usage.
+- **Python** — `snowflake-connector-python` or `snowflake-sqlalchemy`. See [programmatic-access.md](programmatic-access.md#python) for examples.
 - **Any JDBC/ODBC client** — DBeaver, DataGrip, etc.
 
 ## Your Team Resources

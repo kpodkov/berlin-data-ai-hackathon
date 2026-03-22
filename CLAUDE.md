@@ -74,7 +74,7 @@ SELECT ... FROM DB_JW_SHARED.CHALLENGE.T1 WHERE ...;
 | T3 | 128M | 17.9 GB | 8 EU markets | Nov 25 – Jan 26 |
 | T4 | 254M | 36.1 GB | 15 global markets | Nov – Dec 25 |
 
-- `OBJECTS` — 2.3M rows of title/content metadata (movies, shows, seasons, episodes)
+- `OBJECTS` — ~13M rows of title/content metadata (movies, shows, seasons, episodes)
 - `PACKAGES` — 1,526 rows of streaming provider lookup
 
 ### Key Event Columns
@@ -82,12 +82,12 @@ SELECT ... FROM DB_JW_SHARED.CHALLENGE.T1 WHERE ...;
 - **Deduplication:** Use `rid` (not `event_id`) to deduplicate rows
 - **Timestamps:** `collector_tstamp` (server-side UTC) or `derived_tstamp` (client clock drift adjusted)
 - **User identity:** `user_id` (anonymous), `login_id` (only when logged in), `session_id`
-- **Event type:** `event` = `page_view` (~5%) or `struct` (~95%); structured events use `se_category`, `se_action`, `se_label`, `se_property`, `se_value`
+- **Event type:** `event` = `page_view` or `struct` (split varies by table); structured events use `se_category`, `se_action`, `se_label`, `se_property`, `se_value`
 - **Custom context JSON columns** (VARIANT type, prefixed `cc_`):
   - `cc_title` — Content metadata (jwEntityId, objectType, season/episode numbers)
   - `cc_page_type` — Page type and `appLocale` (user's chosen market, distinct from geo_country)
   - `cc_clickout` — Provider ID and offer details (only on clickout events)
-  - `cc_yauaa` — Parsed user agent (deviceClass, agentName, etc.) — use for bot detection
+  - `cc_yauaa` — Parsed user agent (deviceClass, agentName, etc.) — bots pre-filtered from dataset
   - `cc_search` — Search query text
 
 ### OBJECTS Table Key Columns
@@ -101,12 +101,11 @@ SELECT ... FROM DB_JW_SHARED.CHALLENGE.T1 WHERE ...;
 ```sql
 -- Access JSON context fields (colon notation + cast)
 cc_title:jwEntityId::TEXT          -- content ID
-cc_title:objectType::TEXT          -- movie / show / season / episode
-cc_page_type:appLocale::TEXT       -- user's chosen market (e.g. 'de_DE')
-cc_yauaa:deviceClass::TEXT         -- 'Desktop', 'Phone', 'Robot', etc.
+cc_title:objectType::TEXT          -- movie / show / show_season / show_episode (note: mixed case in data, e.g. 'movie' and 'MOVIE')
+cc_page_type:appLocale::TEXT       -- user's chosen market (e.g. 'DE')
+cc_yauaa:deviceClass::TEXT         -- 'Desktop', 'Phone', etc.
 
--- Bot filtering (ALWAYS include in production queries)
-WHERE cc_yauaa:deviceClass::TEXT NOT IN ('Robot', 'Spy', 'Hacker')
+-- Note: bot traffic (Robot, Spy, Hacker) has been pre-filtered from the hackathon dataset
 
 -- Deduplication via rid
 QUALIFY ROW_NUMBER() OVER (PARTITION BY rid ORDER BY collector_tstamp) = 1
@@ -130,12 +129,12 @@ WHERE se_category = 'clickout'
 -- Top-N per group (Snowflake QUALIFY clause)
 QUALIFY ROW_NUMBER() OVER (PARTITION BY geo_country ORDER BY event_count DESC) <= 10
 
--- Season/episode join (when cc_title has seasonNumber/episodeNumber)
-LEFT JOIN DB_JW_SHARED.CHALLENGE.OBJECTS ep
-  ON ep.title_id = o.object_id
-  AND ep.object_type = 'episode'
-  AND ep.season_number IS NOT DISTINCT FROM cc_title:seasonNumber::INT
-  AND ep.episode_number IS NOT DISTINCT FROM cc_title:episodeNumber::INT
+-- Join to exact content row (movie, show, or episode) in one join
+-- IS NOT DISTINCT FROM matches NULLs, so movies/shows match the top-level row
+JOIN DB_JW_SHARED.CHALLENGE.OBJECTS o
+  ON o.title_id = cc_title:jwEntityId::TEXT
+  AND o.season_number IS NOT DISTINCT FROM cc_title:seasonNumber::INT
+  AND o.episode_number IS NOT DISTINCT FROM cc_title:episodeNumber::INT
 ```
 
 ## Snowflake Cortex AI
@@ -176,8 +175,8 @@ For full event details including se_label/se_property/se_value meanings, see `da
 
 ## Data Quality & Gotchas
 
-- **Bot filtering is essential** — Always filter `cc_yauaa:deviceClass::TEXT NOT IN ('Robot', 'Spy', 'Hacker')` in any analysis meant for presentation
-- **appLocale ≠ geo_country** — `cc_page_type:appLocale::TEXT` is the market the user chose (e.g. German expat in France has appLocale='de_DE', geo_country='FR')
+- **Bot traffic pre-filtered** — Bot traffic (Robot, Spy, Hacker deviceClass values) has been pre-filtered from the hackathon dataset, so no bot filtering is needed. The filter `cc_yauaa:deviceClass::TEXT NOT IN ('Robot', 'Spy', 'Hacker')` is shown in examples for reference only.
+- **appLocale ≠ geo_country** — `cc_page_type:appLocale::TEXT` is the market the user chose (e.g. German expat in France has appLocale='DE', geo_country='FR')
 - **Deduplicate via `rid`** — At-least-once delivery means rare duplicate events exist
 - **Movies and shows behave differently** — A movie gets a burst around release then fades; shows accumulate engagement over seasons. Analyze them separately.
 - **cc_title:jwEntityId always points to the top-level title** (tm/ts prefix) even for episode-level events — use seasonNumber/episodeNumber to drill into episodes
@@ -195,4 +194,4 @@ A starter dbt project is in `platforms/dbt/dbt_template/` with source definition
 - `data/examples/starter_queries.sql` — 5 ready-to-run queries (event breakdown, top titles, providers, trending, genre popularity)
 - `data/examples/query_snippets.sql` — Join patterns (title metadata, episodes, providers, logged-in users, market vs location, device detection)
 - `platforms/` — Platform setup guides (Snowflake, dbt, Lightdash, Collate)
-- `challenge_ideas.md` — 5 challenge directions with detailed guidance
+- `challenge_ideas.md` — 6 challenge directions with detailed guidance

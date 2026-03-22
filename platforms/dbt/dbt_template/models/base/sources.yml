@@ -23,7 +23,7 @@ sources:
           - name: derived_tstamp
             description: Corrected timestamp accounting for client clock drift. More accurate for ordering events within a session.
           - name: event
-            description: "Snowplow event type: 'struct' (~95%) or 'page_view' (~5%)."
+            description: "Snowplow event type: 'struct' or 'page_view'."
           - name: user_id
             description: Anonymous device/browser ID assigned by JustWatch. Persistent across sessions on the same device. Not linked to any personal account.
           - name: login_id
@@ -65,7 +65,7 @@ sources:
             description: >
               OBJECT. Page type context present on all events.
               Key fields: cc_page_type:pageType::TEXT (e.g. 'title_detail', 'home'),
-              cc_page_type:appLocale::TEXT (user's chosen market, e.g. 'de_DE' — distinct from geo_country).
+              cc_page_type:appLocale::TEXT (user's chosen market, e.g. 'DE' — distinct from geo_country).
           - name: cc_clickout
             description: >
               OBJECT. Clickout context — present only on se_category = 'clickout' events.
@@ -74,9 +74,9 @@ sources:
           - name: cc_yauaa
             description: >
               OBJECT. Parsed user agent via YAUAA library.
-              Key fields: cc_yauaa:deviceClass::TEXT ('Desktop', 'Phone', 'Tablet', 'Robot', 'Spy', 'Hacker'),
+              Key fields: cc_yauaa:deviceClass::TEXT ('Desktop', 'Phone', 'Tablet'),
               cc_yauaa:agentName::TEXT (browser name).
-              Always filter cc_yauaa:deviceClass NOT IN ('Robot','Spy','Hacker') for production queries.
+              Bots (Robot/Spy/Hacker) were pre-filtered from the hackathon data and are not present.
           - name: cc_search
             description: >
               OBJECT. Search context — present on search-related events.
@@ -108,7 +108,7 @@ sources:
           - name: object_id
             description: "JustWatch content ID. Primary key. Prefix indicates type: 'tm' = movie, 'ts' = show, 'tss' = season, 'tse' = episode. Join with cc_title:jwEntityId::TEXT."
           - name: object_type
-            description: "Content type: 'movie', 'show', 'season', 'episode'."
+            description: "Content type: 'movie', 'show', 'show_season', 'show_episode'."
           - name: title_id
             description: Top-level title ID. Same as object_id for movies/shows. Points to parent show for seasons/episodes.
           - name: parent_id

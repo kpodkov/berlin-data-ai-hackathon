@@ -72,5 +72,5 @@ Everything about the challenge dataset — table schemas, tracking framework, ev
 
 | Doc | What it covers |
 | --- | -------------- |
-| [challenge_ideas.md](challenge_ideas.md) | 5 challenge directions + tips |
+| [challenge_ideas.md](challenge_ideas.md) | 6 challenge directions + tips |
 

@@ -35,7 +35,7 @@ All data lives in `DB_JW_SHARED.CHALLENGE` (read-only, shared across all teams).
 ## Key things to know
 
 - **Deduplicate with `rid`**, not `event_id` — at-least-once delivery means rare duplicates exist
-- **Filter bots** — always include `cc_yauaa:deviceClass::TEXT NOT IN ('Robot', 'Spy', 'Hacker')`
-- **`appLocale` ≠ `geo_country`** — a German expat in France has `appLocale='de_DE'` but `geo_country='FR'`
-- **95% of events are `struct`** (structured events with `se_*` fields), only ~5% are `page_view`
+- **Filter bots** — `cc_yauaa:deviceClass::TEXT NOT IN ('Robot', 'Spy', 'Hacker')` returns no rows in the hackathon dataset (bots have been pre-filtered), but it's good practice to include
+- **`appLocale` ≠ `geo_country`** — a German expat in France has `appLocale='DE'` but `geo_country='FR'`
+- **Events are split between `struct`** (structured events with `se_*` fields) **and `page_view`**
 - **Context columns are VARIANT/OBJECT** — access nested fields with colon notation: `cc_title:jwEntityId::TEXT`

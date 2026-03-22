@@ -13,7 +13,7 @@ One row per event. Source: JustWatch Snowplow tracking pipeline.
 | 2 | `event_id` | VARCHAR | Event identifier (UUID). May have rare duplicates due to the nature of the Snowplow tracking pipeline (at-least-once delivery) — use rid for guaranteed uniqueness. |
 | 3 | `collector_tstamp` | TIMESTAMP_NTZ | When the Snowplow collector received the event (UTC). Primary timestamp for time-based analysis. |
 | 4 | `derived_tstamp` | TIMESTAMP_NTZ | Corrected timestamp accounting for client clock drift. More accurate for ordering events within a session. |
-| 5 | `event` | VARCHAR | Snowplow event type: "struct" (~95%) or "page_view" (~5%). |
+| 5 | `event` | VARCHAR | Snowplow event type: "struct" or "page_view". |
 | 6 | `user_id` | VARCHAR | Anonymous device/browser ID assigned by JustWatch. Persistent across sessions on the same device. Not linked to any personal account. |
 | 7 | `login_id` | VARCHAR | JustWatch login ID. Present when the user is logged in (~14% of events), NULL otherwise. Useful for identifying cross-device behaviour. |
 | 8 | `session_id` | VARCHAR | JustWatch session ID. One session = continuous activity with <30 min inactivity. |
