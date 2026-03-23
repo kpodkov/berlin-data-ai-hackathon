@@ -1,5 +1,14 @@
 {
   "version": 1,
-  "charts": {},
-  "dashboards": {}
+  "charts": {
+    "fa-env-green-count": "chart-env-green-count.yml",
+    "fa-env-yellow-count": "chart-env-yellow-count.yml",
+    "fa-env-red-count": "chart-env-red-count.yml",
+    "fa-env-indicator-table": "chart-env-indicator-table.yml",
+    "fa-risk-score": "chart-risk-score.yml",
+    "fa-risk-table": "chart-risk-table.yml"
+  },
+  "dashboards": {
+    "financial-advisor-dashboard": "dashboard-financial-advisor.yml"
+  }
 }
