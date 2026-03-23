@@ -44,7 +44,7 @@ models:
     description: "AI-generated per-user financial advice. One row per user_id (subset of users who received personalised advice — ~50K rows)."
     columns:
       - name: user_id
-        data_tests: [not_null]
+        data_tests: [not_null, unique]
       - name: financial_advice
 
   - name: stg_segment_intelligence

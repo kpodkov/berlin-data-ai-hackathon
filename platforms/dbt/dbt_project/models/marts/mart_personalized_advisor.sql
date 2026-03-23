@@ -6,9 +6,14 @@
 -- personalized_action is a plain-English recommendation derived from the
 -- user's wealth_tier and the signal_color of each matched indicator.
 --
+-- ECB context (eur_usd_rate, eu_inflation_rate, ecb_deposit_rate) is joined
+-- as scalar columns onto every row for European macro enrichment.
+-- Grain is unchanged: (user_id, macro_series_id).
+--
 -- Sources:
---   int_user_wealth_proxy  — behavioral wealth proxy, one row per user
---   fct_market_environment — macro regime snapshot, one row per FRED series
+--   int_user_wealth_proxy    — behavioral wealth proxy, one row per user
+--   fct_market_environment   — macro regime snapshot, one row per FRED series
+--   mart_currency_environment — ECB signals, one row per (series_id, month_date)
 
 {{ config(materialized='table', schema='marts') }}
 
@@ -20,6 +25,19 @@ wealth as (
 
 macro as (
     select * from {{ ref('fct_market_environment') }}
+),
+
+ecb_context as (
+    select
+        series_id       as ecb_series_id,
+        title           as ecb_title,
+        value           as ecb_value,
+        yoy_change_pct  as ecb_yoy_change_pct,
+        trend_direction as ecb_trend_direction,
+        signal_color    as ecb_signal_color,
+        as_of_period    as ecb_as_of_period
+    from {{ ref('mart_currency_environment') }}
+    where series_id in ('ECB_EXR_USD', 'ECB_HICP_U2', 'ECB_RATE_DFR')
 ),
 
 combined as (
@@ -60,10 +78,23 @@ combined as (
             else 'Monitor macro conditions — mixed signals'
         end                                                         as personalized_action,
 
+        eur_usd.ecb_value                                           as eur_usd_rate,
+        eur_usd.ecb_trend_direction                                 as eur_usd_trend,
+        eur_usd.ecb_signal_color                                    as eur_usd_signal,
+        eu_inflation.ecb_value                                      as eu_inflation_rate,
+        eu_inflation.ecb_signal_color                               as eu_inflation_signal,
+        ecb_rate.ecb_value                                          as ecb_deposit_rate,
+
         current_timestamp()                                         as _loaded_at
 
     from wealth as u
     cross join macro as env
+    left join (select * from ecb_context where ecb_series_id = 'ECB_EXR_USD') as eur_usd
+        on 1 = 1
+    left join (select * from ecb_context where ecb_series_id = 'ECB_HICP_U2') as eu_inflation
+        on 1 = 1
+    left join (select * from ecb_context where ecb_series_id = 'ECB_RATE_DFR') as ecb_rate
+        on 1 = 1
     where
         (
             u.macro_focus = 'Market Performance & Rates'
@@ -95,5 +126,11 @@ select
     personalized_action,
     financial_advice,
     ai_insight,
+    eur_usd_rate,
+    eur_usd_trend,
+    eur_usd_signal,
+    eu_inflation_rate,
+    eu_inflation_signal,
+    ecb_deposit_rate,
     _loaded_at
 from combined

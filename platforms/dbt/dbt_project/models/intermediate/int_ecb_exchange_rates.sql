@@ -31,6 +31,10 @@ monthly as (
     from observations as obs
     left join metadata as meta
         on obs.series_id = meta.series_id
+    qualify row_number() over (
+        partition by obs.series_id, date_trunc('month', obs.obs_date)
+        order by obs.obs_date desc
+    ) = 1
 ),
 
 with_yoy as (
