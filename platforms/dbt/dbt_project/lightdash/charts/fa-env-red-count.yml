@@ -1,7 +1,7 @@
 chartConfig:
   config:
     label: Red Signals
-    selectedField: fct_market_environment_count_red_signals
+    selectedField: mart_market_environment_count_red_signals
     showBigNumberLabel: true
   type: big_number
 contentType: chart
@@ -11,12 +11,12 @@ metricQuery:
   customDimensions: []
   dimensionOverrides: {}
   dimensions: []
-  exploreName: fct_market_environment
+  exploreName: mart_market_environment
   filters: {}
   limit: 1
   metricOverrides: {}
   metrics:
-    - fct_market_environment_count_red_signals
+    - mart_market_environment_count_red_signals
   sorts: []
   tableCalculations: []
 name: Red Signals
@@ -24,6 +24,6 @@ slug: fa-env-red-count
 spaceSlug: shared
 tableConfig:
   columnOrder:
-    - fct_market_environment_count_red_signals
-tableName: fct_market_environment
+    - mart_market_environment_count_red_signals
+tableName: mart_market_environment
 version: 1

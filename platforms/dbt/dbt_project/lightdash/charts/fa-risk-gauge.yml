@@ -1,6 +1,6 @@
 chartConfig:
   config:
-    selectedField: fct_risk_monitor_composite_risk_score
+    selectedField: mart_risk_monitor_composite_risk_score
     min: 0
     max: 100
     showAxisLabels: true
@@ -24,12 +24,12 @@ metricQuery:
   customDimensions: []
   dimensionOverrides: {}
   dimensions: []
-  exploreName: fct_risk_monitor
+  exploreName: mart_risk_monitor
   filters: {}
   limit: 1
   metricOverrides: {}
   metrics:
-    - fct_risk_monitor_composite_risk_score
+    - mart_risk_monitor_composite_risk_score
   sorts: []
   tableCalculations: []
 name: "Risk Score Gauge"
@@ -37,6 +37,6 @@ slug: fa-risk-gauge
 spaceSlug: shared
 tableConfig:
   columnOrder:
-    - fct_risk_monitor_composite_risk_score
-tableName: fct_risk_monitor
+    - mart_risk_monitor_composite_risk_score
+tableName: mart_risk_monitor
 version: 1

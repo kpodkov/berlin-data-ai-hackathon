@@ -1,7 +1,7 @@
 chartConfig:
   config:
     label: "Risk Level"
-    selectedField: fct_risk_monitor_overall_risk_label
+    selectedField: mart_risk_monitor_overall_risk_label
     showBigNumberLabel: true
   type: big_number
 contentType: chart
@@ -11,8 +11,8 @@ metricQuery:
   customDimensions: []
   dimensionOverrides: {}
   dimensions:
-    - fct_risk_monitor_overall_risk_label
-  exploreName: fct_risk_monitor
+    - mart_risk_monitor_overall_risk_label
+  exploreName: mart_risk_monitor
   filters: {}
   limit: 1
   metricOverrides: {}
@@ -24,6 +24,6 @@ slug: fa-risk-label
 spaceSlug: shared
 tableConfig:
   columnOrder:
-    - fct_risk_monitor_overall_risk_label
-tableName: fct_risk_monitor
+    - mart_risk_monitor_overall_risk_label
+tableName: mart_risk_monitor
 version: 1
