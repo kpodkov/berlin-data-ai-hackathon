@@ -1,7 +1,7 @@
 -- Grain: one row per (title_entity_id, event_date)
 -- Aggregates all demand signals from events into daily counts per top-level title.
--- Used by: fct_title_licensing_score (rolled up to title total)
---          fct_title_seasonality (rolled up to weekly)
+-- Used by: mart_title_licensing_score (rolled up to title total)
+--          mart_title_seasonality (rolled up to weekly)
 --
 -- Source: stg_events_t1 (prototype — change to t2/t3 to scale)
 {{ config(materialized='table') }}

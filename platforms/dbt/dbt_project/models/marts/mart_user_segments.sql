@@ -8,7 +8,7 @@
 --   casual      → occasional user, below top-quartile on both intent types
 --   dormant     → fewer than 2 total events
 --
--- Segments are used in fct_segment_title_demand and fct_title_acquisition_priority
+-- Segments are used in mart_segment_title_demand and mart_title_acquisition_priority
 -- to connect content licensing decisions to the users they serve.
 {{ config(materialized='table') }}
 

@@ -7,13 +7,13 @@
 --   whale rows    → TVOD acquisition signal (transactional buyers)
 --   churn_risk rows → Retention-driven acquisition signal
 --
--- Used by: fct_title_acquisition_priority
+-- Used by: mart_title_acquisition_priority
 {{ config(materialized='table') }}
 
 with user_segments as (
     -- Only non-dormant users carry meaningful segment signal
     select user_id, user_segment
-    from {{ ref('fct_user_segments') }}
+    from {{ ref('mart_user_segments') }}
     where user_segment != 'dormant'
 ),
 
@@ -65,7 +65,7 @@ select
     ste.tvod_clickouts,
     ste.unique_users,
 
-    -- weighted demand scores (consistent with fct_title_licensing_score weights)
+    -- weighted demand scores (consistent with mart_title_licensing_score weights)
     (ste.page_views * 1 + ste.watchlist_adds * 5 + ste.avod_clickouts * 10)    as avod_demand,
     (ste.rent_clickouts * 10 + ste.buy_clickouts * 8)                          as tvod_demand
 

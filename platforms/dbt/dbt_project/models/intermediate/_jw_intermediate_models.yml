@@ -8,8 +8,8 @@ models:
       Aggregates page views, watchlist/seenlist/like actions, trailer plays, and clickout intents
       (AVOD, TVOD, SVOD) from stg_events_t1 into counts per day.
       Source is T1 (Germany/December); change the ref to scale to T2–T4.
-      Used by fct_title_licensing_score (rolled up to title total)
-      and fct_title_seasonality (rolled up to weekly).
+      Used by mart_title_licensing_score (rolled up to title total)
+      and mart_title_seasonality (rolled up to weekly).
     config:
       meta:
         contains_pii: no
@@ -63,8 +63,8 @@ models:
       Grain: one row per (title_entity_id, app_locale).
       Uses app_locale (user's selected market) — not geo_country (physical location) —
       which is the correct dimension for cross-market licensing ROI analysis.
-      Includes weighted AVOD and TVOD demand scores using the same formula as fct_title_licensing_score.
-      Used by fct_market_demand_gap (market entry scorecard).
+      Includes weighted AVOD and TVOD demand scores using the same formula as mart_title_licensing_score.
+      Used by mart_market_demand_gap (market entry scorecard).
     config:
       meta:
         contains_pii: no
@@ -94,11 +94,11 @@ models:
       - name: avod_demand
         description: >
           Weighted AVOD demand score: (page_views × 1) + (watchlist_adds × 5) + (avod_clickouts × 10).
-          Consistent with fct_title_licensing_score weights.
+          Consistent with mart_title_licensing_score weights.
       - name: tvod_demand
         description: >
           Weighted TVOD demand score: tvod_clickouts × 10.
-          Consistent with fct_title_licensing_score weights.
+          Consistent with mart_title_licensing_score weights.
 
   - name: int_title_provider_supply
     description: >
@@ -108,8 +108,8 @@ models:
       a clickout to a provider is strong evidence the offer exists.
       This is a demand-based proxy, not a catalogue feed: a title with zero clickouts to a
       provider may still be available there but had no observed demand.
-      Used by fct_title_licensing_score (to detect supply gaps) and
-      fct_market_demand_gap (to measure coverage per market).
+      Used by mart_title_licensing_score (to detect supply gaps) and
+      mart_market_demand_gap (to measure coverage per market).
     config:
       meta:
         contains_pii: no
@@ -149,7 +149,7 @@ models:
       recent (Dec 15–31) periods to enable churn risk detection via engagement drop-off.
       Includes AVOD, TVOD, and SVOD intent signal counts, session and title breadth metrics,
       and the user's primary app_locale (most-used market).
-      Used by fct_user_segments.
+      Used by mart_user_segments.
     config:
       meta:
         contains_pii: no

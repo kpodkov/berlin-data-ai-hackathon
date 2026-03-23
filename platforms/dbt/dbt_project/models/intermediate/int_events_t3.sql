@@ -4,7 +4,7 @@
 --
 -- Requires WH_TEAM_<N>_S or larger (128M rows, 17.9 GB).
 --
--- Used by: fct_title_seasonality
+-- Used by: mart_title_seasonality
 {{ config(materialized='view') }}
 
 select * from {{ ref('stg_events_t3') }}

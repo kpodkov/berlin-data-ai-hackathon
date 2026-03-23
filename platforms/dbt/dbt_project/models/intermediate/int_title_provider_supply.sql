@@ -6,8 +6,8 @@
 -- A title with zero clickouts to a provider may still be available there — it just had no
 -- observed demand. Use alongside demand signals, not as ground truth.
 --
--- Used by: fct_title_licensing_score (to detect supply gaps)
---          fct_market_demand_gap (to measure coverage per market)
+-- Used by: mart_title_licensing_score (to detect supply gaps)
+--          mart_market_demand_gap (to measure coverage per market)
 {{ config(materialized='table') }}
 
 with clickouts as (

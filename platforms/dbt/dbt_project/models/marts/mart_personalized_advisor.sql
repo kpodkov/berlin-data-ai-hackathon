@@ -12,7 +12,7 @@
 --
 -- Sources:
 --   int_user_wealth_proxy    — behavioral wealth proxy, one row per user
---   fct_market_environment   — macro regime snapshot, one row per FRED series
+--   mart_market_environment   — macro regime snapshot, one row per FRED series
 --   mart_currency_environment — ECB signals, one row per (series_id, month_date)
 
 {{ config(materialized='table', schema='marts') }}
@@ -24,7 +24,7 @@ wealth as (
 ),
 
 macro as (
-    select * from {{ ref('fct_market_environment') }}
+    select * from {{ ref('mart_market_environment') }}
 ),
 
 ecb_context as (

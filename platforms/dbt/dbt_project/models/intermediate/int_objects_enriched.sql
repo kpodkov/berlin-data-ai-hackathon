@@ -2,8 +2,8 @@
 -- Filters stg_objects to top-level titles only (title_id = object_id).
 -- Exposes all metadata columns needed by mart models.
 --
--- Used by: fct_segment_title_demand, fct_title_seasonality,
---          fct_genre_demand_profile, fct_title_licensing_score
+-- Used by: mart_segment_title_demand, mart_title_seasonality,
+--          mart_genre_demand_profile, mart_title_licensing_score
 {{ config(materialized='view') }}
 
 select

@@ -15,7 +15,7 @@
 {{ config(materialized='table') }}
 
 with licensing as (
-    select * from {{ ref('fct_title_licensing_score') }}
+    select * from {{ ref('mart_title_licensing_score') }}
 ),
 
 -- Pull segment demand for each title
@@ -25,7 +25,7 @@ binger_demand as (
         avod_demand     as binger_avod_demand,
         tvod_demand     as binger_tvod_demand,
         unique_users    as binger_users
-    from {{ ref('fct_segment_title_demand') }}
+    from {{ ref('mart_segment_title_demand') }}
     where user_segment = 'binger'
 ),
 
@@ -35,7 +35,7 @@ whale_demand as (
         avod_demand     as whale_avod_demand,
         tvod_demand     as whale_tvod_demand,
         unique_users    as whale_users
-    from {{ ref('fct_segment_title_demand') }}
+    from {{ ref('mart_segment_title_demand') }}
     where user_segment = 'whale'
 ),
 
@@ -46,7 +46,7 @@ churn_demand as (
         avod_demand                 as churn_risk_avod_demand,
         tvod_demand                 as churn_risk_tvod_demand,
         unique_users                as churn_risk_users
-    from {{ ref('fct_segment_title_demand') }}
+    from {{ ref('mart_segment_title_demand') }}
     where user_segment = 'churn_risk'
 ),
 

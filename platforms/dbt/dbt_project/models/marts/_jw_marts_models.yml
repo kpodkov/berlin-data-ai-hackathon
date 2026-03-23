@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: fct_genre_demand_profile
+  - name: mart_genre_demand_profile
     description: >
       Genre-level demand profile aggregating AVOD and TVOD signals across all titles.
       Grain: one row per genre.
@@ -48,7 +48,7 @@ models:
       - name: tvod_demand_per_title
         description: Average TVOD demand score per title in this genre. Demand intensity metric.
 
-  - name: fct_market_demand_gap
+  - name: mart_market_demand_gap
     description: >
       Market entry scorecard identifying demand-to-supply gaps per user-chosen market.
       Grain: one row per app_locale (user's chosen market).
@@ -108,7 +108,7 @@ models:
       - name: tvod_opportunity_score
         description: total_tvod_demand × tvod_gap_ratio. Composite TVOD opportunity score.
 
-  - name: fct_segment_title_demand
+  - name: mart_segment_title_demand
     description: >
       Title demand signals broken down by user behavioural segment.
       Grain: one row per (title_entity_id, user_segment). Excludes dormant users.
@@ -116,7 +116,7 @@ models:
       binger rows signal AVOD acquisition opportunity;
       whale rows signal TVOD acquisition opportunity;
       churn_risk rows signal retention-driven acquisition priority.
-      Used by fct_title_acquisition_priority to apply segment-specific acquisition bonuses.
+      Used by mart_title_acquisition_priority to apply segment-specific acquisition bonuses.
     config:
       meta:
         contains_pii: no
@@ -156,17 +156,17 @@ models:
       - name: avod_demand
         description: >
           Weighted AVOD demand score: (page_views × 1) + (watchlist_adds × 5) + (avod_clickouts × 10).
-          Consistent with fct_title_licensing_score weights.
+          Consistent with mart_title_licensing_score weights.
       - name: tvod_demand
         description: >
           Weighted TVOD demand score: (rent_clickouts × 10) + (buy_clickouts × 8).
-          Consistent with fct_title_licensing_score weights.
+          Consistent with mart_title_licensing_score weights.
 
-  - name: fct_title_acquisition_priority
+  - name: mart_title_acquisition_priority
     description: >
       Ranked content acquisition shopping list for JustWatch AVOD licensing decisions.
       Grain: one row per top-level title.
-      Combines fct_title_licensing_score ROI scores with segment-specific demand signals
+      Combines mart_title_licensing_score ROI scores with segment-specific demand signals
       (bingers, whales, churn-risk users) to produce composite_acquisition_score and acquisition_rank.
       Strategic bonuses applied on top of base ROI:
         +25 cross_market (demanded in 3+ markets),
@@ -212,9 +212,9 @@ models:
       - name: cost_multiplier
         description: Numeric cost multiplier used in ROI scoring. Higher = more expensive to license.
       - name: avod_raw_score
-        description: Weighted AVOD demand score from fct_title_licensing_score.
+        description: Weighted AVOD demand score from mart_title_licensing_score.
       - name: tvod_raw_score
-        description: Weighted TVOD demand score from fct_title_licensing_score.
+        description: Weighted TVOD demand score from mart_title_licensing_score.
       - name: avod_roi_score
         description: avod_raw_score / cost_multiplier. Primary AVOD licensing ROI signal.
       - name: tvod_roi_score
@@ -282,7 +282,7 @@ models:
       - name: tvod_to_avod_rank
         description: Rank within is_tvod_to_avod_candidate = true, ordered by tvod_raw_score descending.
 
-  - name: fct_title_licensing_score
+  - name: mart_title_licensing_score
     description: >
       Core licensing intelligence output ranking titles by AVOD and TVOD revenue potential.
       Grain: one row per top-level title (movie or show).
@@ -406,7 +406,7 @@ models:
       - name: tvod_roi_rank
         description: Rank by tvod_roi_score descending. Use to find best-value TVOD candidates.
 
-  - name: fct_title_seasonality
+  - name: mart_title_seasonality
     description: >
       Weekly demand trends per title over the November 2025 – January 2026 window.
       Grain: one row per (title_entity_id, week_start).
@@ -466,7 +466,7 @@ models:
       - name: avod_score_wow_change
         description: weekly_avod_score minus the prior week's weekly_avod_score. Null for the first week per title.
 
-  - name: fct_user_segments
+  - name: mart_user_segments
     description: >
       Behavioural segmentation of all users with normalised intent scores.
       Grain: one row per user_id.
@@ -476,7 +476,7 @@ models:
         churn_risk  — previously active, recent engagement dropped >50% (churn overrides other segments),
         casual      — below top-quartile on both intent types but ≥2 events,
         dormant     — fewer than 2 total events.
-      Segments feed fct_segment_title_demand and fct_title_acquisition_priority.
+      Segments feed mart_segment_title_demand and mart_title_acquisition_priority.
     config:
       meta:
         contains_pii: no

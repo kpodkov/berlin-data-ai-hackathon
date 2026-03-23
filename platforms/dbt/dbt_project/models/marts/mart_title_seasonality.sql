@@ -27,7 +27,7 @@ weekly as (
         count(distinct user_id)                                                 as unique_users,
         count(distinct app_locale)                                              as market_count,
 
-        -- Weekly scoring (same weights as fct_title_licensing_score)
+        -- Weekly scoring (same weights as mart_title_licensing_score)
         (
             count_if(event = 'page_view')                                 * 1
             + count_if(se_category = 'watchlist_add')                     * 5

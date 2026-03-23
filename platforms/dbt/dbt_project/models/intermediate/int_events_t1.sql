@@ -2,7 +2,7 @@
 -- Passthrough of stg_events_t1. Exposes all event columns for marts
 -- that need raw event rows (e.g. for user-level joins before aggregation).
 --
--- Used by: fct_segment_title_demand
+-- Used by: mart_segment_title_demand
 {{ config(materialized='view') }}
 
 select * from {{ ref('stg_events_t1') }}

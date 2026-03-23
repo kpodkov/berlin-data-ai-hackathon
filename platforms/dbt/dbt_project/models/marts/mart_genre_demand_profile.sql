@@ -6,7 +6,7 @@
 {{ config(materialized='table') }}
 
 with title_totals as (
-    -- Aggregate daily demand signals to title level, using same weights as fct_title_licensing_score
+    -- Aggregate daily demand signals to title level, using same weights as mart_title_licensing_score
     select
         title_entity_id,
         sum(
