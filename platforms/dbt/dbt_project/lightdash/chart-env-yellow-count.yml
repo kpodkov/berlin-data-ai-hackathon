@@ -6,12 +6,14 @@ tableName: "fct_market_environment"
 updatedAt: "2026-03-23T00:00:00.000Z"
 
 metricQuery:
+  exploreName: "fct_market_environment"
   dimensions: []
   metrics:
     - "fct_market_environment_count_yellow_signals"
-  filters: []
+  filters: {}
   sorts: []
   limit: 1
+  tableCalculations: []
 
 chartConfig:
   type: "big_number"
@@ -19,9 +21,3 @@ chartConfig:
     selectedField: "fct_market_environment_count_yellow_signals"
     label: "Yellow Signals"
     showBigNumberLabel: true
-    conditionalFormattings:
-      - color: "#F59E0B"
-        rules:
-          - id: "any-yellow"
-            operator: "greaterThan"
-            values: [0]

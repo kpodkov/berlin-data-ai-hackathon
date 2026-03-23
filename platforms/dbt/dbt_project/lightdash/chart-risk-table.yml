@@ -6,6 +6,7 @@ tableName: "fct_risk_monitor"
 updatedAt: "2026-03-23T00:00:00.000Z"
 
 metricQuery:
+  exploreName: "fct_risk_monitor"
   dimensions:
     - "fct_risk_monitor_risk_indicator"
     - "fct_risk_monitor_category"
@@ -13,11 +14,12 @@ metricQuery:
     - "fct_risk_monitor_action_text"
     - "fct_risk_monitor_overall_risk_label"
   metrics: []
-  filters: []
+  filters: {}
   sorts:
     - fieldId: "fct_risk_monitor_traffic_light"
       descending: false
   limit: 10
+  tableCalculations: []
 
 chartConfig:
   type: "table"

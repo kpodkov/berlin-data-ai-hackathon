@@ -113,6 +113,8 @@ tiles:
       content: |
         ⚠️ **Disclaimer:** Illustrative only — uses finalized historical data. Not investment advice.
 
+tabs: []
+
 config:
   isDateZoomDisabled: true
   isAddFilterDisabled: false

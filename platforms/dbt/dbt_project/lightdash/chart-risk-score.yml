@@ -6,12 +6,14 @@ tableName: "fct_risk_monitor"
 updatedAt: "2026-03-23T00:00:00.000Z"
 
 metricQuery:
+  exploreName: "fct_risk_monitor"
   dimensions: []
   metrics:
     - "fct_risk_monitor_composite_risk_score"
-  filters: []
+  filters: {}
   sorts: []
   limit: 1
+  tableCalculations: []
 
 chartConfig:
   type: "big_number"
@@ -19,19 +21,3 @@ chartConfig:
     selectedField: "fct_risk_monitor_composite_risk_score"
     label: "Overall Risk Score (0–100)"
     showBigNumberLabel: true
-    conditionalFormattings:
-      - color: "#10B981"
-        rules:
-          - id: "low-risk"
-            operator: "lessThan"
-            values: [30]
-      - color: "#F59E0B"
-        rules:
-          - id: "moderate-risk"
-            operator: "inBetween"
-            values: [30, 59]
-      - color: "#EF4444"
-        rules:
-          - id: "high-risk"
-            operator: "greaterThanOrEqual"
-            values: [60]

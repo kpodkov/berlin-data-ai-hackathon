@@ -6,6 +6,7 @@ tableName: "fct_market_environment"
 updatedAt: "2026-03-23T00:00:00.000Z"
 
 metricQuery:
+  exploreName: "fct_market_environment"
   dimensions:
     - "fct_market_environment_category"
     - "fct_market_environment_indicator_name"
@@ -14,11 +15,12 @@ metricQuery:
     - "fct_market_environment_as_of_period"
     - "fct_market_environment_overall_environment"
   metrics: []
-  filters: []
+  filters: {}
   sorts:
     - fieldId: "fct_market_environment_signal_color"
       descending: false
   limit: 20
+  tableCalculations: []
 
 chartConfig:
   type: "table"
