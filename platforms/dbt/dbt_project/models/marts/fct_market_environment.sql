@@ -54,9 +54,9 @@ with macro as (
 -- ---------------------------------------------------------------------------
 signal_counts as (
     select
-        countif(signal_color = 'green')     as green_count,
-        countif(signal_color = 'yellow')    as yellow_count,
-        countif(signal_color = 'red')       as red_count,
+        count_if(signal_color = 'green')    as green_count,
+        count_if(signal_color = 'yellow')   as yellow_count,
+        count_if(signal_color = 'red')      as red_count,
         count(*)                            as total_indicators
     from macro
 ),

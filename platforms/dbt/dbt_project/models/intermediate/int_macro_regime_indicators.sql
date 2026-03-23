@@ -71,8 +71,8 @@ monthly_norm as (
         series_id,
         -- Canonical month identifier: first day of the calendar month
         date_trunc('month', obs_date)::date                         as month_date,
-        -- Latest raw obs_date within the month (meaningful for daily/weekly)
-        max(obs_date)                                               as last_obs_date,
+        -- Latest raw obs_date within the month (QUALIFY keeps the latest row, so obs_date = max)
+        obs_date                                                    as last_obs_date,
         -- Value from the latest observation in the month
         value                                                       as monthly_value,
         title,
