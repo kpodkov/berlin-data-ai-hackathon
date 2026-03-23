@@ -111,7 +111,7 @@ models:
         owner: "@team-3"
         layer: gold
         metrics:
-          overall_risk_score:
+          composite_risk_score:
             type: max
             sql: "${TABLE}.overall_risk_score"
             label: "Overall Risk Score"
@@ -160,6 +160,9 @@ models:
           <30 = Low Risk, 30–59 = Moderate Risk, >=60 = High Risk.
         data_tests:
           - not_null
+        meta:
+          dimension:
+            hidden: true
       - name: overall_risk_label
         description: Human-readable label for the composite risk score.
         data_tests:
