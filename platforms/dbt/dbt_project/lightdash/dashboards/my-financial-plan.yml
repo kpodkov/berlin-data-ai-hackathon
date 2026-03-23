@@ -1,0 +1,106 @@
+config:
+  isAddFilterDisabled: false
+  isDateZoomDisabled: true
+contentType: dashboard
+description: >
+  Select your age group, risk tolerance, and monthly savings to see personalized
+  wealth projections, portfolio recommendations, and action items.
+filters:
+  dimensions:
+    - disabled: false
+      label: "Your Age Group"
+      operator: equals
+      required: true
+      singleValue: true
+      target:
+        fieldId: mart_my_financial_plan_age_group
+        tableName: mart_my_financial_plan
+      values:
+        - "26-35"
+    - disabled: false
+      label: "Risk Tolerance"
+      operator: equals
+      required: true
+      singleValue: true
+      target:
+        fieldId: mart_my_financial_plan_risk_profile
+        tableName: mart_my_financial_plan
+      values:
+        - "Moderate"
+    - disabled: false
+      label: "Monthly Savings"
+      operator: equals
+      required: true
+      singleValue: true
+      target:
+        fieldId: mart_my_financial_plan_savings_label
+        tableName: mart_my_financial_plan
+      values:
+        - "$500/mo"
+  metrics: []
+  tableCalculations: []
+name: "My Financial Plan"
+slug: my-financial-plan
+spaceSlug: shared
+tabs: []
+tiles:
+  - h: 4
+    properties:
+      chartName: "Your Personalized Guidance"
+      chartSlug: mp-action-card
+      hideTitle: false
+      title: "Your Situation & Guidance"
+    type: saved_chart
+    w: 36
+    x: 0
+    "y": 0
+  - h: 4
+    properties:
+      chartName: "Current Rates & Your Return"
+      chartSlug: mp-current-rates
+      hideTitle: false
+      title: "Current Market Rates vs Your Expected Return"
+    type: saved_chart
+    w: 36
+    x: 0
+    "y": 4
+  - h: 10
+    properties:
+      chartName: "Your Wealth Projection"
+      chartSlug: mp-wealth-projection
+      hideTitle: false
+      title: "Your Wealth Over Time"
+    type: saved_chart
+    w: 18
+    x: 0
+    "y": 8
+  - h: 10
+    properties:
+      chartName: "Wealth by Time Horizon"
+      chartSlug: mp-projection-table
+      hideTitle: false
+      title: "Projected Values by Year"
+    type: saved_chart
+    w: 18
+    x: 18
+    "y": 8
+  - h: 8
+    properties:
+      chartName: "Portfolio Options"
+      chartSlug: mp-portfolio-table
+      hideTitle: false
+      title: "Portfolio Allocation Options"
+    type: saved_chart
+    w: 36
+    x: 0
+    "y": 18
+  - h: 2
+    properties:
+      content: "**Disclaimer:** Illustrative only — not investment advice. Based on historical returns (SPY, AGG, GLD, VNQ). Past performance does not predict future results."
+      hideTitle: false
+      title: "Disclaimer"
+    type: markdown
+    w: 36
+    x: 0
+    "y": 26
+version: 1

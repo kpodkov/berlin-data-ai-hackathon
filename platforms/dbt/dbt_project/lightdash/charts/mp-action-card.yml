@@ -1,0 +1,40 @@
+chartConfig:
+  config:
+    columns:
+      mart_my_financial_plan_life_stage:
+        name: "Your Life Stage"
+      mart_my_financial_plan_market_verdict:
+        name: "Market Verdict"
+      mart_my_financial_plan_personalized_action:
+        name: "What You Should Do"
+    hideRowNumbers: true
+    showColumnCalculation: false
+    showTableNames: false
+  type: table
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_my_financial_plan_life_stage
+    - mart_my_financial_plan_market_verdict
+    - mart_my_financial_plan_personalized_action
+  exploreName: mart_my_financial_plan
+  filters: {}
+  limit: 1
+  metricOverrides: {}
+  metrics: []
+  sorts: []
+  tableCalculations: []
+name: "Your Personalized Guidance"
+slug: mp-action-card
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_my_financial_plan_life_stage
+    - mart_my_financial_plan_market_verdict
+    - mart_my_financial_plan_personalized_action
+tableName: mart_my_financial_plan
+version: 1

@@ -1,0 +1,77 @@
+chartConfig:
+  config:
+    layout:
+      flipAxes: false
+      showGridX: false
+      showGridY: true
+      xField: mart_my_financial_plan_horizon_years
+      yField:
+        - mart_my_financial_plan_projected_wealth
+        - mart_my_financial_plan_projected_wealth_real
+        - mart_my_financial_plan_total_contributed
+    eChartsConfig:
+      legend:
+        show: true
+      series:
+        - color: "#3b82f6"
+          encode:
+            xRef:
+              field: mart_my_financial_plan_horizon_years
+            yRef:
+              field: mart_my_financial_plan_projected_wealth
+          name: "Projected Wealth"
+          smooth: true
+          type: line
+        - color: "#10b981"
+          encode:
+            xRef:
+              field: mart_my_financial_plan_horizon_years
+            yRef:
+              field: mart_my_financial_plan_projected_wealth_real
+          name: "After Inflation"
+          smooth: true
+          type: line
+        - color: "#d1d5db"
+          encode:
+            xRef:
+              field: mart_my_financial_plan_horizon_years
+            yRef:
+              field: mart_my_financial_plan_total_contributed
+          name: "Total Saved (no returns)"
+          type: line
+      xAxis:
+        - name: "Years"
+      yAxis:
+        - name: "Portfolio Value ($)"
+  type: cartesian
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_my_financial_plan_horizon_years
+    - mart_my_financial_plan_projected_wealth
+    - mart_my_financial_plan_projected_wealth_real
+    - mart_my_financial_plan_total_contributed
+  exploreName: mart_my_financial_plan
+  filters: {}
+  limit: 10
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - descending: false
+      fieldId: mart_my_financial_plan_horizon_years
+  tableCalculations: []
+name: "Your Wealth Projection"
+slug: mp-wealth-projection
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_my_financial_plan_horizon_years
+    - mart_my_financial_plan_projected_wealth
+    - mart_my_financial_plan_projected_wealth_real
+    - mart_my_financial_plan_total_contributed
+tableName: mart_my_financial_plan
+version: 1
