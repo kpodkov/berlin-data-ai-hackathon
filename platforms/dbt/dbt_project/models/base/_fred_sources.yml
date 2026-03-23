@@ -1,0 +1,55 @@
+version: 2
+
+sources:
+  - name: team_raw
+    database: DB_TEAM_3
+    schema: RAW
+    tables:
+
+      - name: FRED_OBSERVATIONS
+        description: >
+          FRED (Federal Reserve Economic Data) time series observations.
+          One row per (series_id, obs_date). Source: St. Louis Fed FRED API.
+          Covers 31 US macro series at mixed frequencies: daily (DGS10, VIXCLS, SP500),
+          monthly (UNRATE, CPIAUCSL, FEDFUNDS, PSAVERT, etc.), and quarterly (GDPC1, TDSP).
+          Missing FRED values (returned as ".") are stored as NULL.
+        columns:
+          - name: SERIES_ID
+            description: >
+              FRED series identifier. Composite primary key with obs_date.
+              Examples: GDPC1 (Real GDP), UNRATE (Unemployment Rate), CPIAUCSL (CPI),
+              FEDFUNDS (Fed Funds Rate), DGS10 (10Y Treasury), VIXCLS (VIX), SP500 (S&P 500).
+          - name: OBS_DATE
+            description: >
+              Observation date. Composite primary key with series_id.
+              Date format varies by frequency: daily series have one row per trading/calendar day,
+              monthly series have the 1st of each month, quarterly series have the 1st of the quarter.
+          - name: VALUE
+            description: >
+              Observation value. Units vary by series — see FRED_SERIES_METADATA for unit descriptions.
+              NULL when FRED reports the value as missing (raw FRED missing code "." is stored as NULL).
+
+      - name: FRED_SERIES_METADATA
+        description: >
+          FRED series catalogue. One row per series_id.
+          Covers all series present in FRED_OBSERVATIONS.
+          Source: FRED API series endpoint (https://api.stlouisfed.org/fred/series).
+        columns:
+          - name: SERIES_ID
+            description: FRED series identifier. Primary key. Matches SERIES_ID in FRED_OBSERVATIONS.
+          - name: TITLE
+            description: Human-readable series name (e.g. "Real Gross Domestic Product").
+          - name: UNITS
+            description: Units of measurement (e.g. "Billions of Chained 2017 Dollars", "Percent").
+          - name: FREQUENCY
+            description: "Observation frequency: Daily, Weekly, Monthly, Quarterly, Annual."
+          - name: SEASONAL_ADJUSTMENT
+            description: >
+              Seasonal adjustment status from FRED
+              (e.g. "Seasonally Adjusted Annual Rate", "Not Seasonally Adjusted").
+          - name: LAST_UPDATED
+            description: Timestamp of the most recent data update on FRED (UTC).
+          - name: CATEGORY
+            description: >
+              Category label assigned during ingestion for grouping purposes
+              (e.g. "Real GDP (quarterly)", "Unemployment Rate (monthly)").

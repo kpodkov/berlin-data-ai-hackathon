@@ -1,0 +1,68 @@
+version: 2
+
+sources:
+  - name: team_raw
+    database: DB_TEAM_3
+    schema: RAW
+    tables:
+
+      - name: MARKET_METADATA
+        description: >
+          Metadata catalogue for financial market series ingested into DB_TEAM_3.RAW.MARKET_PRICES.
+          One row per series_id. Source: Yahoo Finance via yfinance Python library.
+          Covers 13 daily-frequency instruments: US equity ETFs (SPY, QQQ, XLE), bond ETFs (AGG, TLT, TIP),
+          real estate (VNQ), gold (GLD), international equity (VEA, VWO), cryptocurrencies (BTC-USD, ETH-USD),
+          and the US Dollar Index (DX-Y.NYB).
+        columns:
+          - name: SERIES_ID
+            description: >
+              Yahoo Finance ticker symbol. Primary key. Matches SERIES_ID in MARKET_PRICES.
+              Known tickers:
+                Equity ETFs  — SPY (S&P 500), QQQ (Nasdaq 100), XLE (Energy Sector)
+                Bond ETFs    — AGG (US Aggregate Bond), TLT (20+ Year Treasury), TIP (TIPS / inflation-protected)
+                Real Estate  — VNQ (Vanguard Real Estate)
+                Commodities  — GLD (Gold ETF)
+                International— VEA (Developed Markets ex-US), VWO (Emerging Markets)
+                Crypto       — BTC-USD (Bitcoin), ETH-USD (Ethereum)
+                FX/Index     — DX-Y.NYB (US Dollar Index)
+          - name: TITLE
+            description: Human-readable instrument name (e.g. "S&P 500 ETF", "Bitcoin USD").
+          - name: UNITS
+            description: Currency denomination. All tickers denominated in USD.
+          - name: FREQUENCY
+            description: Data frequency. All instruments are Daily.
+          - name: SOURCE
+            description: Data provider. Always "Yahoo Finance".
+
+      - name: MARKET_PRICES
+        description: >
+          Daily closing price time series for 13 financial market instruments sourced from Yahoo Finance.
+          One row per (series_id, obs_date). Values represent adjusted closing prices in USD.
+          Date ranges vary by instrument — see individual series for earliest available date:
+            SPY, QQQ, XLE       from 2000-01-03  (~6,593 rows each)
+            DX-Y.NYB            from 2000-01-03  (~6,623 rows)
+            AGG                 from 2003-09-29  (~5,655 rows)
+            TLT                 from 2002-07-30  (~5,949 rows)
+            TIP                 from 2003-12-05  (~5,607 rows)
+            GLD                 from 2004-11-18  (~5,367 rows)
+            VNQ                 from 2004-09-29  (~5,403 rows)
+            VWO                 from 2005-03-10  (~5,291 rows)
+            VEA                 from 2007-07-26  (~4,693 rows)
+            BTC-USD             from 2014-09-17  (~4,206 rows)
+            ETH-USD             from 2017-11-09  (~3,057 rows)
+          All data through March 2026.
+        columns:
+          - name: SERIES_ID
+            description: >
+              Yahoo Finance ticker symbol. Composite primary key with obs_date.
+              See MARKET_METADATA for full instrument descriptions.
+          - name: OBS_DATE
+            description: >
+              Trading date (calendar date). Note: weekends and market holidays are absent
+              for traditional exchange instruments. Crypto (BTC-USD, ETH-USD) includes all calendar days.
+              Composite primary key with series_id.
+          - name: VALUE
+            description: >
+              Adjusted closing price in USD (NUMBER(38,8)).
+              NULL indicates no data available for this date (e.g. market holiday not filtered, missing fetch).
+              Use NUMBER(38,8) precision — do not cast to FLOAT.

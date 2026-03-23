@@ -1,0 +1,66 @@
+version: 1
+name: "Risk Monitor — Indicator Detail"
+slug: "fa-risk-table"
+spaceSlug: "financial-advisor"
+tableName: "fct_risk_monitor"
+updatedAt: "2026-03-23T00:00:00.000Z"
+
+metricQuery:
+  exploreName: "fct_risk_monitor"
+  dimensions:
+    - "fct_risk_monitor_risk_indicator"
+    - "fct_risk_monitor_category"
+    - "fct_risk_monitor_traffic_light"
+    - "fct_risk_monitor_action_text"
+    - "fct_risk_monitor_overall_risk_label"
+  metrics: []
+  filters: {}
+  sorts:
+    - fieldId: "fct_risk_monitor_traffic_light"
+      descending: false
+  limit: 10
+  tableCalculations: []
+
+chartConfig:
+  type: "table"
+  config:
+    showColumnCalculation: false
+    hideRowNumbers: true
+    showTableNames: false
+    columns:
+      fct_risk_monitor_risk_indicator:
+        name: "Risk Indicator"
+        frozen: true
+      fct_risk_monitor_category:
+        name: "Category"
+      fct_risk_monitor_traffic_light:
+        name: "Signal"
+      fct_risk_monitor_action_text:
+        name: "Interpretation & Action"
+      fct_risk_monitor_overall_risk_label:
+        name: "Overall Risk"
+    conditionalFormattings:
+      - target:
+          fieldId: "fct_risk_monitor_traffic_light"
+        color: "#10B981"
+        rules:
+          - id: "green-risk"
+            operator: "equals"
+            values: ["green"]
+        applyTo: "cell"
+      - target:
+          fieldId: "fct_risk_monitor_traffic_light"
+        color: "#F59E0B"
+        rules:
+          - id: "yellow-risk"
+            operator: "equals"
+            values: ["yellow"]
+        applyTo: "cell"
+      - target:
+          fieldId: "fct_risk_monitor_traffic_light"
+        color: "#EF4444"
+        rules:
+          - id: "red-risk"
+            operator: "equals"
+            values: ["red"]
+        applyTo: "cell"

@@ -1,0 +1,186 @@
+version: 2
+
+models:
+  - name: fct_market_environment
+    description: >
+      Unified macro environment snapshot. Grain: one row per indicator (~9 rows).
+      Answers "Where are we in the economic cycle?" with traffic-light signals and an overall verdict.
+      Each row carries the full verdict context (overall_environment, traffic light counts)
+      via a cross-join — this makes every row self-contained for Lightdash tile filtering.
+      DISCLAIMER: Illustrative only — uses finalized historical data. Not investment advice.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: gold
+        metrics:
+          count_red_signals:
+            type: count
+            sql: "CASE WHEN ${TABLE}.signal_color = 'red' THEN 1 END"
+            label: "Red Signals"
+            description: "Number of macro indicators currently in red (unfavorable)."
+          count_green_signals:
+            type: count
+            sql: "CASE WHEN ${TABLE}.signal_color = 'green' THEN 1 END"
+            label: "Green Signals"
+            description: "Number of macro indicators currently in green (favorable)."
+          count_yellow_signals:
+            type: count
+            sql: "CASE WHEN ${TABLE}.signal_color = 'yellow' THEN 1 END"
+            label: "Yellow Signals"
+            description: "Number of macro indicators currently in yellow (neutral)."
+          avg_z_score:
+            type: average
+            sql: "${TABLE}.z_score"
+            label: "Avg Z-Score"
+            description: "Average z-score across all macro indicators."
+    columns:
+      - name: series_id
+        description: FRED series identifier. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: indicator_name
+        description: Human-readable indicator name (e.g. 'Real Gross Domestic Product').
+        data_tests:
+          - not_null
+      - name: category
+        description: >
+          Dashboard grouping derived from series_id:
+          Growth, Inflation, Labor Market, Interest Rates, Consumer Health, Market Sentiment.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['Growth', 'Inflation', 'Labor Market', 'Interest Rates', 'Consumer Health', 'Market Sentiment', 'Other']
+      - name: units
+        description: Units of latest_value (varies by series).
+      - name: as_of_period
+        description: YYYY-MM period of the latest observation.
+        data_tests:
+          - not_null
+      - name: latest_value
+        description: Most recent monthly value, rounded to 2 decimal places.
+      - name: yoy_change_pct
+        description: Year-over-year percentage change.
+      - name: z_score
+        description: Standardized score vs. trailing 36-month window. Null during warm-up period.
+      - name: regime_label
+        description: Regime classification based on z-score (Elevated, Normal, Depressed).
+        data_tests:
+          - accepted_values:
+              values: ['Elevated', 'Normal', 'Depressed', 'Insufficient data']
+      - name: signal_color
+        description: Traffic-light color for this indicator (green/yellow/red).
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+        meta:
+          dimension:
+            type: string
+      - name: overall_environment
+        description: >
+          Majority-vote verdict across all indicators:
+          'Favorable' (>=60% green), 'Caution Advised' (>=40% red), 'Mixed Signals' otherwise.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['Favorable', 'Caution Advised', 'Mixed Signals']
+      - name: overall_traffic_light
+        description: Traffic-light color for the overall environment verdict.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+      - name: green_count
+        description: Number of green indicators in this snapshot.
+      - name: yellow_count
+        description: Number of yellow indicators in this snapshot.
+      - name: red_count
+        description: Number of red indicators in this snapshot.
+      - name: disclaimer
+        description: Always 'Illustrative only — uses finalized historical data. Not investment advice.'
+      - name: _loaded_at
+        description: Timestamp when this model was last built (UTC).
+
+  - name: fct_risk_monitor
+    description: >
+      Traffic-light risk monitor with composite risk score.
+      Grain: one row per risk indicator (~4 rows), each carrying the overall composite score.
+      Answers "Should I be worried right now?" with per-indicator detail and an overall verdict.
+      Overall risk score = AVG of signal scores (red=100, yellow=50, green=0).
+      DISCLAIMER: Illustrative only — uses finalized historical data. Not investment advice.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: gold
+        metrics:
+          composite_risk_score:
+            type: max
+            sql: "${TABLE}.overall_risk_score"
+            label: "Overall Risk Score"
+            description: "Composite risk score 0–100. Red=100, Yellow=50, Green=0 per indicator, averaged."
+          count_red_risks:
+            type: count
+            sql: "CASE WHEN ${TABLE}.traffic_light = 'red' THEN 1 END"
+            label: "Red Risk Signals"
+            description: "Number of risk indicators currently in red."
+    columns:
+      - name: risk_indicator
+        description: Name of the risk indicator. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: category
+        description: Category grouping (Interest Rates, Financial Markets, Consumer Prices, Labour Market).
+        data_tests:
+          - not_null
+      - name: risk_value
+        description: Numeric signal value. Interpretation depends on indicator — see units column.
+      - name: units
+        description: Units of risk_value (e.g. 'percentage points', 'index points').
+        data_tests:
+          - not_null
+      - name: traffic_light
+        description: Per-indicator traffic-light signal.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+        meta:
+          dimension:
+            type: string
+      - name: action_text
+        description: Plain-English interpretation and recommended action for this indicator.
+        data_tests:
+          - not_null
+      - name: urgency_rank
+        description: Sort order — red=1, yellow=2, green=3.
+      - name: signal_score
+        description: Numeric score for this indicator — red=100, yellow=50, green=0.
+      - name: overall_risk_score
+        description: >
+          Composite risk score 0–100 = AVG(signal_score) across all indicators.
+          <30 = Low Risk, 30–59 = Moderate Risk, >=60 = High Risk.
+        data_tests:
+          - not_null
+        meta:
+          dimension:
+            hidden: true
+      - name: overall_risk_label
+        description: Human-readable label for the composite risk score.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['Low Risk', 'Moderate Risk', 'High Risk']
+      - name: overall_traffic_light
+        description: Traffic-light color corresponding to overall_risk_label.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+      - name: disclaimer
+        description: Always 'Illustrative only — uses finalized historical data. Not investment advice.'
+      - name: _loaded_at
+        description: Timestamp when this model was last built (UTC).

@@ -1,0 +1,206 @@
+version: 2
+
+models:
+  - name: int_macro_regime_indicators
+    description: >
+      Monthly-aligned FRED macro signals with z-scores and regime labels.
+      Grain: one row per series_id (latest monthly snapshot only).
+      All series normalized to monthly grain before z-score computation (judge fix applied):
+      daily/weekly → last value in month; quarterly → sparse monthly rows retained as-is.
+      Z-scores use a rolling 36-month window; null when < 12 months of data available.
+      Signal colors are direction-aware: high VIX/unemployment = red; high GDP/savings = green.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: series_id
+        description: FRED series identifier. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: month_date
+        description: First day of the calendar month this snapshot represents.
+        data_tests:
+          - not_null
+      - name: last_obs_date
+        description: Actual date of the last raw observation used (meaningful for daily series).
+      - name: value
+        description: Latest monthly value. Units vary by series — see base_fred_series_metadata.
+      - name: value_12m_ago
+        description: Value 12 monthly observations prior. Null if history is insufficient.
+      - name: yoy_change_pct
+        description: Year-over-year percentage change. Null if value_12m_ago is null or zero.
+      - name: rolling_mean_36m
+        description: Rolling 36-month mean of the monthly series.
+      - name: rolling_stddev_36m
+        description: Rolling 36-month standard deviation (sample).
+      - name: rolling_count
+        description: Number of non-null observations in the 36-month window.
+      - name: z_score
+        description: >
+          (value − mean) / stddev over the trailing 36 months. Null when rolling_count < 12.
+          Comparable across series because all are normalized to the same window.
+        data_tests:
+          - not_null:
+              where: "rolling_count >= 12 and rolling_stddev_36m > 0"
+      - name: regime_label
+        description: Human-readable regime based on z-score thresholds.
+        data_tests:
+          - accepted_values:
+              values: ['Elevated', 'Normal', 'Depressed', 'Insufficient data']
+      - name: signal_color
+        description: >
+          Traffic-light color for the dashboard. Direction-aware:
+          GDPC1/PSAVERT/SP500 = green when high, red when low.
+          UNRATE/TDSP/VIXCLS/CPIAUCSL = red when high, green when low.
+          DGS10/FEDFUNDS = always yellow (context-only).
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+      - name: as_of_period
+        description: YYYY-MM label of the latest observation month.
+        data_tests:
+          - not_null
+      - name: title
+        description: Human-readable series name from base_fred_series_metadata.
+      - name: units
+        description: Units of the value column for this series.
+      - name: frequency
+        description: Original FRED frequency (Daily, Monthly, Quarterly, etc.).
+      - name: seasonal_adjustment
+        description: Seasonal adjustment status from FRED metadata.
+
+  - name: int_asset_returns
+    description: >
+      Monthly returns, rolling volatility, drawdowns, and Sharpe ratios per instrument.
+      Grain: one row per (series_id, month_date). Resampled from daily prices to monthly
+      (last closing price per month). Covers 13 instruments from base_market_prices.
+      Sharpe ratio uses annualized 12-month return / annualized 12-month vol (no risk-free rate).
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: series_id
+        description: Yahoo Finance ticker. Composite primary key with month_date.
+        data_tests:
+          - not_null
+      - name: month_date
+        description: First day of the calendar month. Composite primary key with series_id.
+        data_tests:
+          - not_null
+      - name: title
+        description: Instrument name from base_market_metadata.
+      - name: asset_class
+        description: >
+          Derived asset class grouping: US Equity, US Equity (Growth), Energy, US Bonds,
+          Long Treasury, TIPS, Real Estate, Gold, Intl Developed, Intl Emerging, Crypto, USD Index.
+      - name: data_source
+        description: Always 'Yahoo Finance'.
+      - name: monthly_close
+        description: Adjusted closing price on the last trading day of the month (USD).
+      - name: monthly_return
+        description: >
+          (monthly_close / prior_month_close) - 1. Null for the first observation per series.
+      - name: trailing_12m_return
+        description: (monthly_close / close_12m_ago) - 1. Null for first 12 months per series.
+      - name: trailing_12m_vol
+        description: Annualized volatility = STDDEV(monthly_return over 12m) * SQRT(12).
+      - name: sharpe_ratio
+        description: trailing_12m_return / trailing_12m_vol. Null when months_in_window < 12.
+      - name: drawdown_from_ath
+        description: (monthly_close - all_time_high) / all_time_high. Always <= 0.
+      - name: all_time_high
+        description: Maximum monthly close price up to and including this month.
+      - name: months_in_window
+        description: Number of monthly return observations in the trailing 12-month window.
+      - name: momentum_label
+        description: >
+          Trend label based on trailing_12m_return:
+          Strong Uptrend (>10%), Uptrend (0–10%), Downtrend (-10%–0%), Strong Downtrend (<-10%).
+
+  - name: int_fred_time_series
+    description: >
+      Full monthly history of 9 key FRED series with YoY changes for dashboard charting.
+      Grain: one row per (series_id, month_date). Keeps complete history — not just latest.
+      All series normalized to monthly grain (same logic as int_macro_regime_indicators).
+      Intended for Lightdash line charts showing multi-year trends.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: series_id
+        description: FRED series identifier. Composite primary key with month_date.
+        data_tests:
+          - not_null
+      - name: month_date
+        description: First day of the calendar month. Composite primary key with series_id.
+        data_tests:
+          - not_null
+      - name: title
+        description: Human-readable series name from base_fred_series_metadata.
+      - name: units
+        description: Units of the value column for this series.
+      - name: frequency
+        description: Original FRED frequency (before monthly normalization).
+      - name: category
+        description: Category label from base_fred_series_metadata (e.g. 'Real GDP (quarterly)').
+      - name: value
+        description: Monthly value (last observation in month for daily series).
+      - name: value_12m_ago
+        description: Value 12 monthly rows prior. Null for first year of history per series.
+      - name: yoy_change_pct
+        description: Year-over-year percentage change. Null when value_12m_ago is null or zero.
+
+  - name: int_risk_dashboard
+    description: >
+      Four macro risk indicators in tall format. Grain: one row per risk_indicator (~4 rows).
+      Each row has a traffic-light, numeric risk_value, and plain-English action_text.
+      Indicators: Yield Curve Signal, Market Volatility (VIX), Inflation Momentum, Unemployment Trend.
+      Note: "recession probability" was replaced with "yield curve signal" per design review —
+      true probability requires a calibrated model not available in this dataset.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: risk_indicator
+        description: Name of the risk indicator. Primary key.
+        data_tests:
+          - not_null
+          - unique
+          - accepted_values:
+              values:
+                - 'Yield Curve Signal'
+                - 'Market Volatility (VIX)'
+                - 'Inflation Momentum'
+                - 'Unemployment Trend'
+      - name: category
+        description: Category grouping for the indicator.
+        data_tests:
+          - not_null
+      - name: risk_value
+        description: Numeric signal value (interpretation depends on indicator — see units).
+      - name: units
+        description: Units of risk_value (e.g. 'percentage points', 'index points').
+      - name: traffic_light
+        description: Traffic-light signal.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+      - name: action_text
+        description: Plain-English interpretation and recommended action for this indicator.
+        data_tests:
+          - not_null
+      - name: urgency_rank
+        description: Sort order — red=1, yellow=2, green=3. Use for dashboard ordering.
+      - name: _loaded_at
+        description: Timestamp when this model was last built (UTC).

@@ -1,0 +1,29 @@
+chartConfig:
+  config:
+    label: Overall Risk Score (0–100)
+    selectedField: fct_risk_monitor_composite_risk_score
+    showBigNumberLabel: true
+  type: big_number
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions: []
+  exploreName: fct_risk_monitor
+  filters: {}
+  limit: 1
+  metricOverrides: {}
+  metrics:
+    - fct_risk_monitor_composite_risk_score
+  sorts: []
+  tableCalculations: []
+name: Overall Risk Score
+slug: fa-risk-score
+spaceSlug: financial-advisor
+tableConfig:
+  columnOrder:
+    - fct_risk_monitor_composite_risk_score
+tableName: fct_risk_monitor
+version: 1

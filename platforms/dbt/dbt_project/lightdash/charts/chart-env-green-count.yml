@@ -1,0 +1,23 @@
+version: 1
+name: "Green Signals"
+slug: "fa-env-green-count"
+spaceSlug: "financial-advisor"
+tableName: "fct_market_environment"
+updatedAt: "2026-03-23T00:00:00.000Z"
+
+metricQuery:
+  exploreName: "fct_market_environment"
+  dimensions: []
+  metrics:
+    - "fct_market_environment_count_green_signals"
+  filters: {}
+  sorts: []
+  limit: 1
+  tableCalculations: []
+
+chartConfig:
+  type: "big_number"
+  config:
+    selectedField: "fct_market_environment_count_green_signals"
+    label: "Green Signals"
+    showBigNumberLabel: true
