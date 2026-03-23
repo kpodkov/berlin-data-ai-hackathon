@@ -1,0 +1,29 @@
+chartConfig:
+  config:
+    label: "Market Verdict"
+    selectedField: fct_market_environment_overall_environment
+    showBigNumberLabel: true
+  type: big_number
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - fct_market_environment_overall_environment
+  exploreName: fct_market_environment
+  filters: {}
+  limit: 1
+  metricOverrides: {}
+  metrics: []
+  sorts: []
+  tableCalculations: []
+name: "Market Environment Verdict"
+slug: fa-env-verdict
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - fct_market_environment_overall_environment
+tableName: fct_market_environment
+version: 1

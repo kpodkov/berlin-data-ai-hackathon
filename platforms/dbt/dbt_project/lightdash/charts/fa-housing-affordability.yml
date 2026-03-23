@@ -1,0 +1,79 @@
+chartConfig:
+  config:
+    layout:
+      xField: mart_housing_affordability_obs_month_month
+      yField:
+        - mart_housing_affordability_home_price_to_income_ratio
+        - mart_housing_affordability_mortgage_pct_of_income
+      flipAxes: false
+      showGridX: false
+      showGridY: true
+    eChartsConfig:
+      xAxis:
+        - name: ""
+      yAxis:
+        - name: "Price/Income Ratio"
+        - name: "Mortgage % of Income"
+      legend:
+        show: true
+      series:
+        - type: line
+          name: "Home Price / Income"
+          color: "#3b82f6"
+          smooth: true
+          yAxisIndex: 0
+          encode:
+            xRef:
+              field: mart_housing_affordability_obs_month_month
+            yRef:
+              field: mart_housing_affordability_home_price_to_income_ratio
+        - type: line
+          name: "Mortgage % of Income"
+          color: "#ef4444"
+          smooth: true
+          yAxisIndex: 1
+          encode:
+            xRef:
+              field: mart_housing_affordability_obs_month_month
+            yRef:
+              field: mart_housing_affordability_mortgage_pct_of_income
+  type: cartesian
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_housing_affordability_obs_month_month
+    - mart_housing_affordability_home_price_to_income_ratio
+    - mart_housing_affordability_mortgage_pct_of_income
+  exploreName: mart_housing_affordability
+  filters:
+    dimensions:
+      id: "last-10-years"
+      and:
+        - target:
+            fieldId: mart_housing_affordability_obs_month
+          operator: inThePast
+          values: [10]
+          settings:
+            unitOfTime: years
+            completed: false
+  limit: 500
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - fieldId: mart_housing_affordability_obs_month_month
+      descending: false
+  tableCalculations: []
+name: "Housing Affordability Trends"
+slug: fa-housing-affordability
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_housing_affordability_obs_month_month
+    - mart_housing_affordability_home_price_to_income_ratio
+    - mart_housing_affordability_mortgage_pct_of_income
+tableName: mart_housing_affordability
+version: 1

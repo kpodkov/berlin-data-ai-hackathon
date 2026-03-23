@@ -3,147 +3,305 @@ config:
   isDateZoomDisabled: true
 contentType: dashboard
 description: >
-  Macro environment and risk monitor for financial advisors. Illustrative only —
-  uses finalized historical data. Not investment advice.
+  Comprehensive financial advisor dashboard: macro environment, risk monitor,
+  investment performance, and personal finance metrics.
+  Illustrative only — uses finalized historical data. Not investment advice.
 filters:
-  dimensions:
-    - target:
-        fieldId: fct_market_environment_as_of_period
-        tableName: fct_market_environment
-      operator: equals
-      values: []
-      label: "As Of Period (YYYY-MM)"
-      required: false
-      disabled: false
-      tileTargets:
-        fa-risk-score: false
-        fa-risk-table: false
+  dimensions: []
   metrics: []
   tableCalculations: []
-name: Financial Advisor Dashboard
+name: Financial & Wealth Advisor
 slug: financial-advisor-dashboard
 spaceSlug: shared
-tabs: []
+tabs:
+  - uuid: "53bd2191-18ee-4466-8785-6de8627ab14b"
+    name: "Market Environment"
+    order: 0
+  - uuid: "b97e1dbd-a13e-4813-874e-37ecbec1b3ff"
+    name: "Risk Monitor"
+    order: 1
+  - uuid: "4e84746d-795d-4e3e-81a5-479c5ef90e68"
+    name: "Investment Performance"
+    order: 2
+  - uuid: "062557ae-39fd-4c75-b5ea-f02eb3d238ef"
+    name: "Personal Finance"
+    order: 3
 tiles:
-  - h: 1
+  # =========================================================================
+  # TAB 1: Market Environment
+  # =========================================================================
+  - h: 2
     properties:
-      showDivider: false
-      text: "📊 Section 1 — Market Environment: Where are we in the economic cycle?"
-    tabUuid: null
-    type: heading
+      content: "## Where are we in the economic cycle?"
+      title: ""
+      hideTitle: true
+    tabUuid: "53bd2191-18ee-4466-8785-6de8627ab14b"
+    type: markdown
     w: 36
     x: 0
     "y": 0
+
+  - h: 4
+    properties:
+      chartName: "Market Environment Verdict"
+      chartSlug: fa-env-verdict
+      hideTitle: false
+      title: "Overall Verdict"
+    tabUuid: "53bd2191-18ee-4466-8785-6de8627ab14b"
+    type: saved_chart
+    w: 9
+    x: 0
+    "y": 1
+
   - h: 4
     properties:
       chartName: Green Signals
       chartSlug: fa-env-green-count
       hideTitle: false
-      title: Green Signals
-    tabUuid: null
-    tileSlug: fa-env-green-count
+      title: "Green Signals"
+    tabUuid: "53bd2191-18ee-4466-8785-6de8627ab14b"
     type: saved_chart
-    w: 12
-    x: 0
+    w: 9
+    x: 9
     "y": 1
+
   - h: 4
     properties:
       chartName: Yellow Signals
       chartSlug: fa-env-yellow-count
       hideTitle: false
-      title: Yellow Signals
-    tabUuid: null
-    tileSlug: fa-env-yellow-count
+      title: "Yellow Signals"
+    tabUuid: "53bd2191-18ee-4466-8785-6de8627ab14b"
     type: saved_chart
-    w: 12
-    x: 12
+    w: 9
+    x: 18
     "y": 1
+
   - h: 4
     properties:
       chartName: Red Signals
       chartSlug: fa-env-red-count
       hideTitle: false
-      title: Red Signals
-    tabUuid: null
-    tileSlug: fa-env-red-count
+      title: "Red Signals"
+    tabUuid: "53bd2191-18ee-4466-8785-6de8627ab14b"
     type: saved_chart
-    w: 12
-    x: 24
+    w: 9
+    x: 27
     "y": 1
+
   - h: 10
     properties:
-      chartName: Market Environment — Indicator Breakdown
+      chartName: "Market Environment — Indicator Breakdown"
       chartSlug: fa-env-indicator-table
       hideTitle: false
-      title: Macro Indicator Breakdown
-    tabUuid: null
-    tileSlug: fa-env-indicator-table
+      title: "Macro Indicator Breakdown"
+    tabUuid: "53bd2191-18ee-4466-8785-6de8627ab14b"
     type: saved_chart
     w: 36
     x: 0
     "y": 5
-  - h: 1
+
+  # =========================================================================
+  # TAB 2: Risk Monitor
+  # =========================================================================
+  - h: 2
     properties:
-      showDivider: false
-      text: "🚨 Section 4 — Risk Monitor: Should I be worried right now?"
-    tabUuid: null
-    type: heading
+      content: "## Should you be worried right now?"
+      title: ""
+      hideTitle: true
+    tabUuid: "b97e1dbd-a13e-4813-874e-37ecbec1b3ff"
+    type: markdown
     w: 36
     x: 0
-    "y": 15
-  - h: 4
+    "y": 0
+
+  - h: 5
     properties:
-      chartName: Overall Risk Score
-      chartSlug: fa-risk-score
+      chartName: "Risk Score Gauge"
+      chartSlug: fa-risk-gauge
       hideTitle: false
-      title: Overall Risk Score
-    tabUuid: null
-    tileSlug: fa-risk-score
+      title: "Risk Score Gauge"
+    tabUuid: "b97e1dbd-a13e-4813-874e-37ecbec1b3ff"
     type: saved_chart
     w: 12
     x: 0
-    "y": 16
-  - h: 4
+    "y": 1
+
+  - h: 5
+    properties:
+      chartName: "Overall Risk Level"
+      chartSlug: fa-risk-label
+      hideTitle: false
+      title: "Risk Level"
+    tabUuid: "b97e1dbd-a13e-4813-874e-37ecbec1b3ff"
+    type: saved_chart
+    w: 12
+    x: 12
+    "y": 1
+
+  - h: 5
+    properties:
+      chartName: "Overall Risk Score"
+      chartSlug: fa-risk-score
+      hideTitle: false
+      title: "Risk Score (0-100)"
+    tabUuid: "b97e1dbd-a13e-4813-874e-37ecbec1b3ff"
+    type: saved_chart
+    w: 12
+    x: 24
+    "y": 1
+
+  - h: 10
+    properties:
+      chartName: "Risk Indicators Breakdown"
+      chartSlug: fa-risk-table
+      hideTitle: false
+      title: "Risk Indicator Detail"
+    tabUuid: "b97e1dbd-a13e-4813-874e-37ecbec1b3ff"
+    type: saved_chart
+    w: 36
+    x: 0
+    "y": 6
+
+  - h: 3
     properties:
       content: |
         | Score | Label | Signal |
         |-------|-------|--------|
-        | &lt; 30 | Low Risk | 🟢 |
-        | 30–59 | Moderate Risk | 🟡 |
-        | ≥ 60 | High Risk | 🔴 |
+        | < 30 | Low Risk | Green |
+        | 30-59 | Moderate Risk | Yellow |
+        | >= 60 | High Risk | Red |
 
-        Score = AVG(red=100, yellow=50, green=0) across all risk indicators.
-      hideFrame: false
+        Score = AVG(red=100, yellow=50, green=0) across 4 risk indicators.
       hideTitle: false
-      title: Risk Score Legend
-    tabUuid: null
+      title: "Risk Score Legend"
+    tabUuid: "b97e1dbd-a13e-4813-874e-37ecbec1b3ff"
     type: markdown
-    w: 24
-    x: 12
+    w: 36
+    x: 0
     "y": 16
+
+  # =========================================================================
+  # TAB 3: Investment Performance
+  # =========================================================================
+  - h: 2
+    properties:
+      content: "## How are asset classes performing?"
+      title: ""
+      hideTitle: true
+    tabUuid: "4e84746d-795d-4e3e-81a5-479c5ef90e68"
+    type: markdown
+    w: 36
+    x: 0
+    "y": 0
+
+  - h: 8
+    properties:
+      chartName: "Trailing 12M Returns by Asset Class"
+      chartSlug: fa-investment-returns-bar
+      hideTitle: false
+      title: "Trailing 12-Month Returns"
+    tabUuid: "4e84746d-795d-4e3e-81a5-479c5ef90e68"
+    type: saved_chart
+    w: 18
+    x: 0
+    "y": 1
+
+  - h: 8
+    properties:
+      chartName: "Cumulative Returns Over Time"
+      chartSlug: fa-investment-cumulative-line
+      hideTitle: false
+      title: "Cumulative Returns (Key Asset Classes)"
+    tabUuid: "4e84746d-795d-4e3e-81a5-479c5ef90e68"
+    type: saved_chart
+    w: 18
+    x: 18
+    "y": 1
+
   - h: 10
     properties:
-      chartName: Risk Monitor — Indicator Detail
-      chartSlug: fa-risk-table
+      chartName: "Asset Performance Snapshot"
+      chartSlug: fa-investment-table
       hideTitle: false
-      title: Risk Indicator Detail
-    tabUuid: null
-    tileSlug: fa-risk-table
+      title: "Asset Performance Detail"
+    tabUuid: "4e84746d-795d-4e3e-81a5-479c5ef90e68"
     type: saved_chart
     w: 36
     x: 0
-    "y": 20
+    "y": 9
+
+  # =========================================================================
+  # TAB 4: Personal Finance
+  # =========================================================================
   - h: 2
     properties:
-      content: >
-        ⚠️ **Disclaimer:** Illustrative only — uses finalized historical data.
-        Not investment advice.
-      hideFrame: false
-      hideTitle: false
+      content: "## Inflation, debt, savings, and housing"
       title: ""
-    tabUuid: null
+      hideTitle: true
+    tabUuid: "062557ae-39fd-4c75-b5ea-f02eb3d238ef"
     type: markdown
     w: 36
     x: 0
-    "y": 30
+    "y": 0
+
+  - h: 8
+    properties:
+      chartName: "Inflation by Category (5Y)"
+      chartSlug: fa-inflation-trend
+      hideTitle: false
+      title: "Inflation by Category (5-Year Trend)"
+    tabUuid: "062557ae-39fd-4c75-b5ea-f02eb3d238ef"
+    type: saved_chart
+    w: 18
+    x: 0
+    "y": 1
+
+  - h: 8
+    properties:
+      chartName: "Real Interest Rates vs Inflation (5Y)"
+      chartSlug: fa-real-rates-line
+      hideTitle: false
+      title: "Real Interest Rates vs Inflation"
+    tabUuid: "062557ae-39fd-4c75-b5ea-f02eb3d238ef"
+    type: saved_chart
+    w: 18
+    x: 18
+    "y": 1
+
+  - h: 10
+    properties:
+      chartName: "Borrowing Costs & Debt (12M)"
+      chartSlug: fa-debt-rates-table
+      hideTitle: false
+      title: "Borrowing Costs & Debt Burden"
+    tabUuid: "062557ae-39fd-4c75-b5ea-f02eb3d238ef"
+    type: saved_chart
+    w: 18
+    x: 0
+    "y": 9
+
+  - h: 10
+    properties:
+      chartName: "Housing Affordability Trends"
+      chartSlug: fa-housing-affordability
+      hideTitle: false
+      title: "Housing Affordability"
+    tabUuid: "062557ae-39fd-4c75-b5ea-f02eb3d238ef"
+    type: saved_chart
+    w: 18
+    x: 18
+    "y": 9
+
+  # Disclaimer at bottom
+  - h: 2
+    properties:
+      content: "**Disclaimer:** Illustrative only. Not investment advice."
+      hideTitle: false
+      title: "Disclaimer"
+    tabUuid: "062557ae-39fd-4c75-b5ea-f02eb3d238ef"
+    type: markdown
+    w: 36
+    x: 0
+    "y": 19
 version: 1

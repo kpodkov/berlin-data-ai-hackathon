@@ -1,0 +1,88 @@
+chartConfig:
+  config:
+    layout:
+      xField: mart_savings_health_obs_month_month
+      yField:
+        - mart_savings_health_real_fed_funds
+        - mart_savings_health_real_treasury_10y
+        - mart_savings_health_cpi_yoy
+      flipAxes: false
+      showGridX: false
+      showGridY: true
+    eChartsConfig:
+      xAxis:
+        - name: ""
+      yAxis:
+        - name: "Rate (%)"
+      legend:
+        show: true
+      series:
+        - type: line
+          name: "Real Fed Funds"
+          color: "#3b82f6"
+          smooth: true
+          encode:
+            xRef:
+              field: mart_savings_health_obs_month_month
+            yRef:
+              field: mart_savings_health_real_fed_funds
+        - type: line
+          name: "Real 10Y Treasury"
+          color: "#10b981"
+          smooth: true
+          encode:
+            xRef:
+              field: mart_savings_health_obs_month_month
+            yRef:
+              field: mart_savings_health_real_treasury_10y
+        - type: line
+          name: "CPI YoY"
+          color: "#ef4444"
+          smooth: true
+          encode:
+            xRef:
+              field: mart_savings_health_obs_month_month
+            yRef:
+              field: mart_savings_health_cpi_yoy
+  type: cartesian
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_savings_health_obs_month_month
+    - mart_savings_health_real_fed_funds
+    - mart_savings_health_real_treasury_10y
+    - mart_savings_health_cpi_yoy
+  exploreName: mart_savings_health
+  filters:
+    dimensions:
+      id: "last-5-years"
+      and:
+        - target:
+            fieldId: mart_savings_health_obs_month
+          operator: inThePast
+          values: [5]
+          settings:
+            unitOfTime: years
+            completed: false
+  limit: 500
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - fieldId: mart_savings_health_obs_month_month
+      descending: false
+  tableCalculations: []
+name: "Real Interest Rates vs Inflation (5Y)"
+slug: fa-real-rates-line
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_savings_health_obs_month_month
+    - mart_savings_health_real_fed_funds
+    - mart_savings_health_real_treasury_10y
+    - mart_savings_health_cpi_yoy
+tableName: mart_savings_health
+version: 1

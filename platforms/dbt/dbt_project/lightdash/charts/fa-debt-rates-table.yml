@@ -1,0 +1,68 @@
+chartConfig:
+  config:
+    showColumnCalculation: false
+    showTableNames: false
+    hideRowNumbers: true
+    columns:
+      mart_debt_burden_obs_month:
+        name: "Month"
+      mart_debt_burden_mortgage_rate:
+        name: "Mortgage Rate %"
+      mart_debt_burden_credit_card_rate:
+        name: "Credit Card Rate %"
+      mart_debt_burden_fed_funds_rate:
+        name: "Fed Funds Rate %"
+      mart_debt_burden_credit_card_spread:
+        name: "CC Spread %"
+      mart_debt_burden_debt_service_ratio:
+        name: "Debt Service %"
+      mart_debt_burden_total_credit_yoy:
+        name: "Credit Growth YoY %"
+  type: table
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_debt_burden_obs_month
+    - mart_debt_burden_mortgage_rate
+    - mart_debt_burden_credit_card_rate
+    - mart_debt_burden_fed_funds_rate
+    - mart_debt_burden_credit_card_spread
+    - mart_debt_burden_debt_service_ratio
+    - mart_debt_burden_total_credit_yoy
+  exploreName: mart_debt_burden
+  filters:
+    dimensions:
+      id: "last-12m"
+      and:
+        - target:
+            fieldId: mart_debt_burden_obs_month
+          operator: inThePast
+          values: [12]
+          settings:
+            unitOfTime: months
+            completed: true
+  limit: 12
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - fieldId: mart_debt_burden_obs_month
+      descending: true
+  tableCalculations: []
+name: "Borrowing Costs & Debt (12M)"
+slug: fa-debt-rates-table
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_debt_burden_obs_month
+    - mart_debt_burden_mortgage_rate
+    - mart_debt_burden_credit_card_rate
+    - mart_debt_burden_fed_funds_rate
+    - mart_debt_burden_credit_card_spread
+    - mart_debt_burden_debt_service_ratio
+    - mart_debt_burden_total_credit_yoy
+tableName: mart_debt_burden
+version: 1

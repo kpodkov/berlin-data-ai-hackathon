@@ -1,0 +1,29 @@
+chartConfig:
+  config:
+    label: "Risk Level"
+    selectedField: fct_risk_monitor_overall_risk_label
+    showBigNumberLabel: true
+  type: big_number
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - fct_risk_monitor_overall_risk_label
+  exploreName: fct_risk_monitor
+  filters: {}
+  limit: 1
+  metricOverrides: {}
+  metrics: []
+  sorts: []
+  tableCalculations: []
+name: "Overall Risk Level"
+slug: fa-risk-label
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - fct_risk_monitor_overall_risk_label
+tableName: fct_risk_monitor
+version: 1
