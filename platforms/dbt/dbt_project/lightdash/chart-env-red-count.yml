@@ -1,0 +1,27 @@
+version: 1
+name: "Red Signals"
+slug: "fa-env-red-count"
+spaceSlug: "financial-advisor"
+tableName: "fct_market_environment"
+updatedAt: "2026-03-23T00:00:00.000Z"
+
+metricQuery:
+  dimensions: []
+  metrics:
+    - "fct_market_environment_count_red_signals"
+  filters: []
+  sorts: []
+  limit: 1
+
+chartConfig:
+  type: "big_number"
+  config:
+    selectedField: "fct_market_environment_count_red_signals"
+    label: "Red Signals"
+    showBigNumberLabel: true
+    conditionalFormattings:
+      - color: "#EF4444"
+        rules:
+          - id: "any-red"
+            operator: "greaterThan"
+            values: [0]

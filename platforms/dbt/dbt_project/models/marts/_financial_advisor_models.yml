@@ -24,6 +24,11 @@ models:
             sql: "CASE WHEN ${TABLE}.signal_color = 'green' THEN 1 END"
             label: "Green Signals"
             description: "Number of macro indicators currently in green (favorable)."
+          count_yellow_signals:
+            type: count
+            sql: "CASE WHEN ${TABLE}.signal_color = 'yellow' THEN 1 END"
+            label: "Yellow Signals"
+            description: "Number of macro indicators currently in yellow (neutral)."
           avg_z_score:
             type: average
             sql: "${TABLE}.z_score"

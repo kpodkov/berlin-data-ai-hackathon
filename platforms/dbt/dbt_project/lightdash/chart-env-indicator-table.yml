@@ -1,0 +1,68 @@
+version: 1
+name: "Market Environment — Indicator Breakdown"
+slug: "fa-env-indicator-table"
+spaceSlug: "financial-advisor"
+tableName: "fct_market_environment"
+updatedAt: "2026-03-23T00:00:00.000Z"
+
+metricQuery:
+  dimensions:
+    - "fct_market_environment_category"
+    - "fct_market_environment_indicator_name"
+    - "fct_market_environment_signal_color"
+    - "fct_market_environment_regime_label"
+    - "fct_market_environment_as_of_period"
+    - "fct_market_environment_overall_environment"
+  metrics: []
+  filters: []
+  sorts:
+    - fieldId: "fct_market_environment_signal_color"
+      descending: false
+  limit: 20
+
+chartConfig:
+  type: "table"
+  config:
+    showColumnCalculation: false
+    hideRowNumbers: true
+    showTableNames: false
+    columns:
+      fct_market_environment_category:
+        name: "Category"
+        frozen: true
+      fct_market_environment_indicator_name:
+        name: "Indicator"
+        frozen: true
+      fct_market_environment_signal_color:
+        name: "Signal"
+      fct_market_environment_regime_label:
+        name: "Regime"
+      fct_market_environment_as_of_period:
+        name: "As Of"
+      fct_market_environment_overall_environment:
+        name: "Overall Environment"
+    conditionalFormattings:
+      - target:
+          fieldId: "fct_market_environment_signal_color"
+        color: "#10B981"
+        rules:
+          - id: "green-signal"
+            operator: "equals"
+            values: ["green"]
+        applyTo: "cell"
+      - target:
+          fieldId: "fct_market_environment_signal_color"
+        color: "#F59E0B"
+        rules:
+          - id: "yellow-signal"
+            operator: "equals"
+            values: ["yellow"]
+        applyTo: "cell"
+      - target:
+          fieldId: "fct_market_environment_signal_color"
+        color: "#EF4444"
+        rules:
+          - id: "red-signal"
+            operator: "equals"
+            values: ["red"]
+        applyTo: "cell"

@@ -1,0 +1,37 @@
+version: 1
+name: "Overall Risk Score"
+slug: "fa-risk-score"
+spaceSlug: "financial-advisor"
+tableName: "fct_risk_monitor"
+updatedAt: "2026-03-23T00:00:00.000Z"
+
+metricQuery:
+  dimensions: []
+  metrics:
+    - "fct_risk_monitor_composite_risk_score"
+  filters: []
+  sorts: []
+  limit: 1
+
+chartConfig:
+  type: "big_number"
+  config:
+    selectedField: "fct_risk_monitor_composite_risk_score"
+    label: "Overall Risk Score (0–100)"
+    showBigNumberLabel: true
+    conditionalFormattings:
+      - color: "#10B981"
+        rules:
+          - id: "low-risk"
+            operator: "lessThan"
+            values: [30]
+      - color: "#F59E0B"
+        rules:
+          - id: "moderate-risk"
+            operator: "inBetween"
+            values: [30, 59]
+      - color: "#EF4444"
+        rules:
+          - id: "high-risk"
+            operator: "greaterThanOrEqual"
+            values: [60]
