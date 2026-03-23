@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: raw
+    database: DB_TEAM_3
+    schema: RAW
+    tables:
+      - name: FRED_OBSERVATIONS
+        description: "FRED time series observations (31 series, 48.5K rows)"
+      - name: FRED_SERIES_METADATA
+        description: "FRED series metadata (title, units, frequency)"
+      - name: MARKET_PRICES
+        description: "Yahoo Finance daily closing prices (13 tickers, 71.6K rows)"
+      - name: MARKET_METADATA
+        description: "Yahoo Finance ticker metadata"
+      - name: WORLDBANK_INDICATORS
+        description: "World Bank development indicators (15 countries, 10 indicators)"
+      - name: WORLDBANK_METADATA
+        description: "World Bank indicator metadata"

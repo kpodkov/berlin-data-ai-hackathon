@@ -34,12 +34,18 @@ models:
     base:
       +materialized: view
       +schema: base
+    staging:
+      +materialized: view
+      +schema: staging
     intermediate:
       +materialized: table
       +schema: intermediate
     marts:
       +materialized: table
       +schema: marts
+    insights:
+      +materialized: table
+      +schema: insights
     ml:
       +materialized: view
       +schema: ml
