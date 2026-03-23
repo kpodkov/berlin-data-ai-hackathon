@@ -32,8 +32,8 @@ with raw_obs as (
         m.units,
         m.frequency,
         m.seasonal_adjustment
-    from {{ ref('base_fred_observations') }} as o
-    inner join {{ ref('base_fred_series_metadata') }} as m
+    from {{ ref('stg_fred_observations') }} as o
+    inner join {{ ref('stg_fred_series_metadata') }} as m
         on o.series_id = m.series_id
     where
         o.series_id in (

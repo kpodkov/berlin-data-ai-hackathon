@@ -18,7 +18,7 @@
 -- DGS10: latest single observation
 with dgs10_latest as (
     select value as dgs10_value
-    from {{ ref('base_fred_observations') }}
+    from {{ ref('stg_fred_observations') }}
     where series_id = 'DGS10'
       and value is not null
     qualify row_number() over (order by obs_date desc) = 1
@@ -27,7 +27,7 @@ with dgs10_latest as (
 -- FEDFUNDS: latest single observation
 fedfunds_latest as (
     select value as fedfunds_value
-    from {{ ref('base_fred_observations') }}
+    from {{ ref('stg_fred_observations') }}
     where series_id = 'FEDFUNDS'
       and value is not null
     qualify row_number() over (order by obs_date desc) = 1
@@ -36,7 +36,7 @@ fedfunds_latest as (
 -- VIXCLS: latest single observation
 vix_latest as (
     select value as vix_value
-    from {{ ref('base_fred_observations') }}
+    from {{ ref('stg_fred_observations') }}
     where series_id = 'VIXCLS'
       and value is not null
     qualify row_number() over (order by obs_date desc) = 1
@@ -49,7 +49,7 @@ cpi_recent as (
     select
         value,
         row_number() over (order by obs_date desc) as rn
-    from {{ ref('base_fred_observations') }}
+    from {{ ref('stg_fred_observations') }}
     where series_id = 'CPIAUCSL'
       and value is not null
     qualify row_number() over (order by obs_date desc) <= 13
@@ -69,7 +69,7 @@ unrate_recent as (
     select
         value,
         row_number() over (order by obs_date desc) as rn
-    from {{ ref('base_fred_observations') }}
+    from {{ ref('stg_fred_observations') }}
     where series_id = 'UNRATE'
       and value is not null
     qualify row_number() over (order by obs_date desc) <= 7

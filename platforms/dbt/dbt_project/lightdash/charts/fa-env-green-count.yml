@@ -21,7 +21,7 @@ metricQuery:
   tableCalculations: []
 name: Green Signals
 slug: fa-env-green-count
-spaceSlug: financial-advisor
+spaceSlug: shared
 tableConfig:
   columnOrder:
     - fct_market_environment_count_green_signals

@@ -21,7 +21,7 @@ metricQuery:
   tableCalculations: []
 name: Overall Risk Score
 slug: fa-risk-score
-spaceSlug: financial-advisor
+spaceSlug: shared
 tableConfig:
   columnOrder:
     - fct_risk_monitor_composite_risk_score

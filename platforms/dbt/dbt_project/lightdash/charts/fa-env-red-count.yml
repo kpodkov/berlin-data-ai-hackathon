@@ -21,7 +21,7 @@ metricQuery:
   tableCalculations: []
 name: Red Signals
 slug: fa-env-red-count
-spaceSlug: financial-advisor
+spaceSlug: shared
 tableConfig:
   columnOrder:
     - fct_market_environment_count_red_signals

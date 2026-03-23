@@ -21,7 +21,7 @@ metricQuery:
   tableCalculations: []
 name: Yellow Signals
 slug: fa-env-yellow-count
-spaceSlug: financial-advisor
+spaceSlug: shared
 tableConfig:
   columnOrder:
     - fct_market_environment_count_yellow_signals

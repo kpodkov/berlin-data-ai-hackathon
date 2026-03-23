@@ -71,7 +71,7 @@ metricQuery:
   tableCalculations: []
 name: Market Environment — Indicator Breakdown
 slug: fa-env-indicator-table
-spaceSlug: financial-advisor
+spaceSlug: shared
 tableConfig:
   columnOrder:
     - fct_market_environment_category

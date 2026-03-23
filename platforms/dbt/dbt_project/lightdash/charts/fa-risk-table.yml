@@ -67,7 +67,7 @@ metricQuery:
   tableCalculations: []
 name: Risk Monitor — Indicator Detail
 slug: fa-risk-table
-spaceSlug: financial-advisor
+spaceSlug: shared
 tableConfig:
   columnOrder:
     - fct_risk_monitor_risk_indicator

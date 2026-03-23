@@ -6,12 +6,23 @@ description: >
   Macro environment and risk monitor for financial advisors. Illustrative only —
   uses finalized historical data. Not investment advice.
 filters:
-  dimensions: []
+  dimensions:
+    - target:
+        fieldId: fct_market_environment_as_of_period
+        tableName: fct_market_environment
+      operator: equals
+      values: []
+      label: "As Of Period (YYYY-MM)"
+      required: false
+      disabled: false
+      tileTargets:
+        fa-risk-score: false
+        fa-risk-table: false
   metrics: []
   tableCalculations: []
 name: Financial Advisor Dashboard
 slug: financial-advisor-dashboard
-spaceSlug: financial-advisor
+spaceSlug: shared
 tabs: []
 tiles:
   - h: 1
