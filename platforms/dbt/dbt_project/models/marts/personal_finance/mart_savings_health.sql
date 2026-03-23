@@ -5,7 +5,7 @@ with monthly_fred as (
         max(case when series_id = 'SAVINGSL' then value end) as savings_level,
         max(case when series_id = 'FEDFUNDS' then value end) as fed_funds_rate,
         max(case when series_id = 'CPIAUCSL' then value end) as cpi_index
-    from {{ ref('stg_fred_timeseries') }}
+    from {{ ref('int_fred_topic_classified') }}
     where topic in ('savings', 'rates', 'cpi')
     group by 1
 ),
@@ -14,7 +14,7 @@ dgs10_monthly as (
     select
         date_trunc('month', obs_date)::date as obs_month,
         round(avg(value), 2) as treasury_10y
-    from {{ ref('stg_fred_timeseries') }}
+    from {{ ref('int_fred_topic_classified') }}
     where series_id = 'DGS10'
     group by 1
 ),

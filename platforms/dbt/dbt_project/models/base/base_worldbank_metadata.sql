@@ -5,7 +5,7 @@
 {{ config(materialized='table', schema='base') }}
 
 with source as (
-    select * from {{ source('team_raw', 'WORLDBANK_METADATA') }}
+    select * from {{ source('raw', 'WORLDBANK_METADATA') }}
 ),
 
 bronze as (

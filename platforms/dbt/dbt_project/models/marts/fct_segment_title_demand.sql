@@ -19,7 +19,7 @@ with user_segments as (
 
 events as (
     select *
-    from {{ ref('base_events_t1') }}
+    from {{ ref('int_events_t1') }}
     where title_entity_id is not null
 ),
 
@@ -43,8 +43,7 @@ segment_title_events as (
 
 objects as (
     select object_id, title, object_type, release_year, imdb_score
-    from {{ ref('base_objects') }}
-    where title_id = object_id      -- top-level titles only
+    from {{ ref('int_objects_enriched') }}
 )
 
 select

@@ -5,7 +5,7 @@
 {{ config(materialized='table', schema='base') }}
 
 with source as (
-    select * from {{ source('team_raw', 'MARKET_PRICES') }}
+    select * from {{ source('raw', 'MARKET_PRICES') }}
 ),
 
 bronze as (

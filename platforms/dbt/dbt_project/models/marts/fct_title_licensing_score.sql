@@ -69,7 +69,7 @@ market_breadth as (
 ),
 
 objects as (
-    -- Top-level titles only: title_id = object_id is true for movies and shows
+    -- Top-level titles only: provided by int_objects_enriched (title_id = object_id filter applied there)
     select
         object_id,
         object_type,
@@ -83,8 +83,7 @@ objects as (
         imdb_votes,
         genre_tmdb,
         poster_jw
-    from {{ ref('base_objects') }}
-    where title_id = object_id
+    from {{ ref('int_objects_enriched') }}
 ),
 
 scored as (

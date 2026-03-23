@@ -6,7 +6,7 @@
 {{ config(materialized='table', schema='base') }}
 
 with source as (
-    select * from {{ source('team_raw', 'WORLDBANK_INDICATORS') }}
+    select * from {{ source('raw', 'WORLDBANK_INDICATORS') }}
 ),
 
 bronze as (

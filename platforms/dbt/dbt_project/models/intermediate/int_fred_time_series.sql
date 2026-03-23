@@ -46,7 +46,6 @@ metadata as (
         title,
         units,
         frequency,
-        seasonal_adjustment,
         category
     from {{ ref('stg_fred_series_metadata') }}
     where series_id in (
@@ -63,7 +62,6 @@ enriched as (
         md.title,
         md.units,
         md.frequency,
-        md.seasonal_adjustment,
         md.category,
 
         -- time dimension
@@ -98,7 +96,6 @@ select
     title,
     units,
     frequency,
-    seasonal_adjustment,
     category,
     month_date,
     value,

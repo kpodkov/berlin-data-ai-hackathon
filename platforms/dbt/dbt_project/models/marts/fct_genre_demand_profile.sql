@@ -38,10 +38,9 @@ title_genre_expanded as (
         o.imdb_score,
         o.imdb_votes,
         g.value::text   as genre
-    from {{ ref('base_objects') }} o,
+    from {{ ref('int_objects_enriched') }} o,
          lateral flatten(input => o.genre_tmdb) as g
-    where o.title_id = o.object_id      -- top-level titles only
-      and o.genre_tmdb is not null
+    where o.genre_tmdb is not null
       and g.value::text is not null
 )
 

@@ -56,6 +56,3 @@ models:
     insights:
       +materialized: table
       +schema: insights
-    ml:
-      +materialized: view
-      +schema: ml

@@ -70,8 +70,6 @@ models:
         description: Units of the value column for this series.
       - name: frequency
         description: Original FRED frequency (Daily, Monthly, Quarterly, etc.).
-      - name: seasonal_adjustment
-        description: Seasonal adjustment status from FRED metadata.
 
   - name: int_asset_returns
     description: >
@@ -204,3 +202,99 @@ models:
         description: Sort order — red=1, yellow=2, green=3. Use for dashboard ordering.
       - name: _loaded_at
         description: Timestamp when this model was last built (UTC).
+
+  - name: int_fred_topic_classified
+    description: >
+      FRED observations joined with series metadata and classified by personal finance topic.
+      Grain: one row per (series_id, obs_date). Provides the topic column used by downstream
+      mart models to filter observations by domain (debt, cpi, housing, savings, rates, etc.).
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: series_id
+        description: FRED series identifier. Composite primary key with obs_date.
+        data_tests:
+          - not_null
+      - name: obs_date
+        description: Observation date. Composite primary key with series_id.
+        data_tests:
+          - not_null
+      - name: value
+        description: Observed value in native units.
+      - name: title
+        description: Human-readable series name from stg_fred_series_metadata.
+      - name: units
+        description: Units of the value column.
+      - name: frequency
+        description: Original FRED frequency (Daily, Monthly, Quarterly, Annual).
+      - name: topic
+        description: >
+          Personal finance domain classification: income, savings, debt, housing, cpi,
+          rates, market, wealth, macro, or other.
+
+  - name: int_market_daily_returns
+    description: >
+      Daily market prices enriched with metadata, asset class label, and daily return.
+      Grain: one row per (series_id, obs_date). Joins base_market_prices with base_market_metadata
+      and computes daily_return via LAG(). Used by mart_investment_performance.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: series_id
+        description: Yahoo Finance ticker symbol. Composite primary key with obs_date.
+        data_tests:
+          - not_null
+      - name: obs_date
+        description: Trading date. Composite primary key with series_id.
+        data_tests:
+          - not_null
+      - name: value
+        description: Adjusted closing price (USD).
+      - name: title
+        description: Instrument name from base_market_metadata.
+      - name: asset_class
+        description: "Asset class bucket: equity, bond, commodity, crypto, real_estate, currency, or other."
+      - name: daily_return
+        description: Day-over-day return as a decimal fraction. Null for the first observation per series.
+      - name: month_key
+        description: First day of the calendar month (date_trunc to month). Used for monthly aggregation.
+
+  - name: int_worldbank_enriched
+    description: >
+      World Bank observations enriched with parsed indicator/country codes, human-readable labels,
+      and title from metadata. Grain: one row per (indicator_code, country_code, obs_date).
+      Joins base_worldbank_indicators + base_worldbank_metadata. Used by mart_global_comparison.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: indicator_code
+        description: World Bank indicator code extracted from the compound series_id.
+        data_tests:
+          - not_null
+      - name: country_code
+        description: ISO3 country code extracted from the compound series_id.
+        data_tests:
+          - not_null
+      - name: indicator_name
+        description: Human-readable indicator name resolved from the indicator_code.
+      - name: country_name
+        description: Human-readable country name resolved from the ISO3 country_code.
+      - name: obs_date
+        description: Observation date (Jan 1 of the reference year for annual World Bank data).
+        data_tests:
+          - not_null
+      - name: obs_year
+        description: Reference year as an integer.
+      - name: value
+        description: Indicator value in native units. Null when data is unavailable for that country-year.
+      - name: title
+        description: Series title from base_worldbank_metadata.

@@ -5,7 +5,7 @@ models:
     description: >
       Bronze layer for FRED series catalogue.
       One row per series_id. Faithful copy of DB_TEAM_3.RAW.FRED_SERIES_METADATA
-      with audit columns added (_source, _loaded_at) and last_updated cast to TIMESTAMP_NTZ.
+      with audit columns added (_source, _loaded_at).
       31 macro series covering GDP, inflation, unemployment, rates, savings, debt,
       volatility, and equity markets.
       Join to base_fred_observations on series_id to enrich observations with descriptions.
@@ -30,10 +30,6 @@ models:
         description: Unit of measurement (e.g. "Billions of Chained 2017 Dollars", "Percent").
       - name: frequency
         description: Observation frequency — Daily, Monthly, Quarterly, or Annual.
-      - name: seasonal_adjustment
-        description: Seasonal adjustment status from FRED metadata.
-      - name: last_updated_at
-        description: Timestamp of the most recent FRED update for this series (TIMESTAMP_NTZ).
       - name: category
         description: >
           Human-readable category label assigned during ingestion

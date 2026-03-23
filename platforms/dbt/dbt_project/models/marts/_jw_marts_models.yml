@@ -1,0 +1,538 @@
+version: 2
+
+models:
+  - name: fct_genre_demand_profile
+    description: >
+      Genre-level demand profile aggregating AVOD and TVOD signals across all titles.
+      Grain: one row per genre.
+      Expands genre_tmdb arrays so titles with multiple genres appear once per genre.
+      Answers: which genres perform best for AVOD (high volume, rewatchable)
+      vs TVOD (premium, event-driven)?
+      Includes demand intensity per title (not just volume) to distinguish a few popular titles
+      from a broad genre with consistent moderate demand.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: genre
+        description: Genre name from TMDB (e.g. 'Drama', 'Comedy', 'Action'). Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: title_count
+        description: Count of distinct top-level titles in this genre with demand signals.
+      - name: movie_count
+        description: Count of distinct movies in this genre with demand signals.
+      - name: show_count
+        description: Count of distinct shows in this genre with demand signals.
+      - name: total_avod_demand
+        description: Sum of AVOD raw scores across all titles in this genre.
+      - name: total_tvod_demand
+        description: Sum of TVOD raw scores across all titles in this genre.
+      - name: total_demand
+        description: Sum of total_avod_demand and total_tvod_demand.
+      - name: total_user_engagements
+        description: Sum of total user engagement counts across all titles in this genre.
+      - name: avod_share
+        description: >
+          AVOD demand as a share of total demand (0 = pure TVOD, 1 = pure AVOD).
+          Null when total_demand is zero.
+      - name: avg_imdb_score
+        description: Average IMDB score across titles in this genre. Quality proxy.
+      - name: avg_release_year
+        description: Average release year across titles in this genre. Recency proxy.
+      - name: avod_demand_per_title
+        description: Average AVOD demand score per title in this genre. Demand intensity metric.
+      - name: tvod_demand_per_title
+        description: Average TVOD demand score per title in this genre. Demand intensity metric.
+
+  - name: fct_market_demand_gap
+    description: >
+      Market entry scorecard identifying demand-to-supply gaps per user-chosen market.
+      Grain: one row per app_locale (user's chosen market).
+      A high avod_gap_ratio means many titles have user interest but no observed free/ads supply —
+      the strongest signal for a JustWatch AVOD launch opportunity.
+      Supply is inferred globally from clickout behaviour (not market-specific), so a "gap"
+      means the title has demand in this market AND no free/ads offer was observed anywhere.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: app_locale
+        description: "User's chosen market (e.g. 'DE', 'FR'). Primary key."
+        data_tests:
+          - not_null
+          - unique
+      - name: total_avod_demand
+        description: Sum of weighted AVOD demand scores across all titles with demand in this market.
+      - name: total_tvod_demand
+        description: Sum of weighted TVOD demand scores across all titles with demand in this market.
+      - name: total_unique_users
+        description: Sum of unique user counts across all title-market combinations in this market.
+      - name: titles_with_demand
+        description: Count of distinct titles with any demand signal in this market.
+      - name: titles_with_avod_demand
+        description: Count of distinct titles with AVOD demand > 0 in this market.
+      - name: titles_with_tvod_demand
+        description: Count of distinct titles with TVOD demand > 0 in this market.
+      - name: titles_with_avod_supply
+        description: Count of distinct titles with observed AVOD supply (globally) among those with AVOD demand.
+      - name: titles_with_tvod_supply
+        description: Count of distinct titles with observed TVOD supply (globally) among those with TVOD demand.
+      - name: avod_gap_titles
+        description: Count of titles with AVOD demand but no observed AVOD supply. The licensing opportunity count.
+      - name: tvod_gap_titles
+        description: Count of titles with TVOD demand but no observed TVOD supply.
+      - name: avod_unmet_demand
+        description: Total AVOD demand volume for titles with no AVOD supply in this market.
+      - name: tvod_unmet_demand
+        description: Total TVOD demand volume for titles with no TVOD supply in this market.
+      - name: avod_gap_ratio
+        description: >
+          avod_gap_titles / titles_with_avod_demand. Share of demand-bearing titles that lack
+          AVOD supply (0 = fully covered, 1 = no supply). Primary market entry signal.
+      - name: tvod_gap_ratio
+        description: tvod_gap_titles / titles_with_tvod_demand. Share of TVOD demand-bearing titles without TVOD supply.
+      - name: avod_supply_coverage
+        description: titles_with_avod_supply / titles_with_avod_demand. Inverse of avod_gap_ratio.
+      - name: tvod_supply_coverage
+        description: titles_with_tvod_supply / titles_with_tvod_demand. Inverse of tvod_gap_ratio.
+      - name: avod_opportunity_score
+        description: >
+          total_avod_demand × avod_gap_ratio. Composite score combining demand volume with gap intensity.
+          Higher = larger untapped AVOD audience in this market. Primary sort column.
+      - name: tvod_opportunity_score
+        description: total_tvod_demand × tvod_gap_ratio. Composite TVOD opportunity score.
+
+  - name: fct_segment_title_demand
+    description: >
+      Title demand signals broken down by user behavioural segment.
+      Grain: one row per (title_entity_id, user_segment). Excludes dormant users.
+      Bridges customer segmentation and content licensing decisions:
+      binger rows signal AVOD acquisition opportunity;
+      whale rows signal TVOD acquisition opportunity;
+      churn_risk rows signal retention-driven acquisition priority.
+      Used by fct_title_acquisition_priority to apply segment-specific acquisition bonuses.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: title_entity_id
+        description: JustWatch content ID. Composite primary key with user_segment.
+        data_tests:
+          - not_null
+      - name: user_segment
+        description: "Behavioural segment label. Composite primary key with title_entity_id. Values: 'whale', 'binger', 'churn_risk', 'casual'."
+        data_tests:
+          - not_null
+      - name: title
+        description: Display title in English from base_objects.
+      - name: object_type
+        description: "Content type: 'movie' or 'show'."
+      - name: release_year
+        description: Year of release from base_objects.
+      - name: imdb_score
+        description: IMDB rating from base_objects. May be null.
+      - name: page_views
+        description: Count of page_view events by users in this segment for this title.
+      - name: watchlist_adds
+        description: Count of watchlist_add events by users in this segment for this title.
+      - name: avod_clickouts
+        description: Count of AVOD clickout events (free/ads) by users in this segment for this title.
+      - name: rent_clickouts
+        description: Count of rent clickout events by users in this segment for this title.
+      - name: buy_clickouts
+        description: Count of buy and cinema clickout events by users in this segment for this title.
+      - name: tvod_clickouts
+        description: Count of all TVOD clickout events (rent/buy/cinema) by users in this segment for this title.
+      - name: unique_users
+        description: Count of distinct users in this segment who engaged with this title.
+      - name: avod_demand
+        description: >
+          Weighted AVOD demand score: (page_views × 1) + (watchlist_adds × 5) + (avod_clickouts × 10).
+          Consistent with fct_title_licensing_score weights.
+      - name: tvod_demand
+        description: >
+          Weighted TVOD demand score: (rent_clickouts × 10) + (buy_clickouts × 8).
+          Consistent with fct_title_licensing_score weights.
+
+  - name: fct_title_acquisition_priority
+    description: >
+      Ranked content acquisition shopping list for JustWatch AVOD licensing decisions.
+      Grain: one row per top-level title.
+      Combines fct_title_licensing_score ROI scores with segment-specific demand signals
+      (bingers, whales, churn-risk users) to produce composite_acquisition_score and acquisition_rank.
+      Strategic bonuses applied on top of base ROI:
+        +25 cross_market (demanded in 3+ markets),
+        +20 avod_underserved (high AVOD demand, no free/ads supply),
+        +15 tvod_to_avod (users pay to rent/buy but no free option exists),
+        +15 churn_prevention (at-risk users requesting this title),
+        +10 binger_driven (AVOD demand primarily from Binger segment).
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: title_entity_id
+        description: JustWatch content ID. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: title
+        description: Display title in English from base_objects.
+      - name: original_title
+        description: Title in the original production language.
+      - name: object_type
+        description: "Content type: 'movie' or 'show'."
+      - name: release_year
+        description: Year of release.
+      - name: release_date
+        description: Full release date. May be null.
+      - name: runtime
+        description: Runtime in minutes.
+      - name: original_language
+        description: ISO 639-1 language code of original production.
+      - name: imdb_score
+        description: IMDB user rating (0.0–10.0). May be null.
+      - name: imdb_votes
+        description: IMDB vote count. Used as licensing cost proxy.
+      - name: genre_tmdb
+        description: ARRAY of TMDB genres from base_objects.
+      - name: poster_jw
+        description: JustWatch poster image URL.
+      - name: cost_tier
+        description: "Estimated licensing cost tier: 'premium', 'mid_tier', 'catalog', 'low_cost'."
+      - name: cost_multiplier
+        description: Numeric cost multiplier used in ROI scoring. Higher = more expensive to license.
+      - name: avod_raw_score
+        description: Weighted AVOD demand score from fct_title_licensing_score.
+      - name: tvod_raw_score
+        description: Weighted TVOD demand score from fct_title_licensing_score.
+      - name: avod_roi_score
+        description: avod_raw_score / cost_multiplier. Primary AVOD licensing ROI signal.
+      - name: tvod_roi_score
+        description: tvod_raw_score / cost_multiplier. Primary TVOD licensing ROI signal.
+      - name: market_count
+        description: Count of distinct markets with any demand signal for this title.
+      - name: total_user_engagements
+        description: Sum of daily unique user counts (engagement-days) across the observation period.
+      - name: active_days
+        description: Count of distinct days with at least one demand event for this title.
+      - name: licensing_recommendation
+        description: "Primary licensing direction: 'avod_priority', 'tvod_priority', or 'low_priority'."
+      - name: has_avod_supply
+        description: Whether any AVOD (free/ads) supply was observed for this title.
+      - name: has_tvod_supply
+        description: Whether any TVOD (rent/buy/cinema) supply was observed for this title.
+      - name: has_svod_supply
+        description: Whether any SVOD (flatrate/sports) supply was observed for this title.
+      - name: avod_provider_count
+        description: Count of distinct AVOD providers observed for this title.
+      - name: tvod_provider_count
+        description: Count of distinct TVOD providers observed for this title.
+      - name: total_provider_count
+        description: Count of all distinct providers observed for this title.
+      - name: is_avod_underserved
+        description: True when avod_raw_score > 0 and no AVOD supply was observed. Key licensing gap flag.
+      - name: is_tvod_underserved
+        description: True when tvod_raw_score > 0 and no TVOD supply was observed.
+      - name: scarcity_index
+        description: 1 / (1 + total_provider_count). Approaches 1 when no supply exists, approaches 0 for widely distributed titles.
+      - name: binger_avod_demand
+        description: AVOD demand score from the Binger segment only.
+      - name: binger_user_count
+        description: Count of Binger users who engaged with this title.
+      - name: whale_tvod_demand
+        description: TVOD demand score from the Whale segment only.
+      - name: whale_user_count
+        description: Count of Whale users who engaged with this title.
+      - name: churn_risk_demand
+        description: Total demand (AVOD + TVOD) from Churn Risk segment users.
+      - name: churn_risk_avod_demand
+        description: AVOD demand from Churn Risk segment users.
+      - name: churn_risk_tvod_demand
+        description: TVOD demand from Churn Risk segment users.
+      - name: churn_risk_user_count
+        description: Count of Churn Risk users who engaged with this title.
+      - name: is_avod_gap_opportunity
+        description: True when title is AVOD-underserved AND has Binger demand. Strongest AVOD acquisition flag.
+      - name: is_tvod_to_avod_candidate
+        description: True when TVOD demand exists but no AVOD supply — users pay to watch it, license the free rights.
+      - name: is_churn_prevention_title
+        description: True when at-risk users are specifically requesting this title.
+      - name: is_cross_market_opportunity
+        description: True when demand exists in 3 or more distinct markets.
+      - name: is_binger_driven
+        description: True when Binger segment accounts for >30% of total AVOD demand for this title.
+      - name: composite_acquisition_score
+        description: >
+          Base ROI score (avod_roi_score + tvod_roi_score) plus strategic bonuses.
+          Primary sort column for the acquisition shopping list.
+      - name: acquisition_rank
+        description: Rank by composite_acquisition_score descending. Rank 1 = highest licensing priority.
+      - name: churn_prevention_rank
+        description: Rank within is_churn_prevention_title = true, ordered by churn_risk_demand descending.
+      - name: tvod_to_avod_rank
+        description: Rank within is_tvod_to_avod_candidate = true, ordered by tvod_raw_score descending.
+
+  - name: fct_title_licensing_score
+    description: >
+      Core licensing intelligence output ranking titles by AVOD and TVOD revenue potential.
+      Grain: one row per top-level title (movie or show).
+      Computes weighted AVOD and TVOD demand scores, divides by an estimated licensing cost
+      multiplier to produce ROI scores, and flags titles with unmet demand
+      (high interest, no current observed supply).
+      Key outputs: avod_roi_score / tvod_roi_score for candidate ranking;
+      is_avod_underserved / is_tvod_underserved for gap identification;
+      licensing_recommendation for dashboard filtering;
+      demand_rank / avod_roi_rank / tvod_roi_rank for sorted views.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: title_entity_id
+        description: JustWatch content ID. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: title
+        description: Display title in English.
+      - name: original_title
+        description: Title in the original production language.
+      - name: object_type
+        description: "Content type: 'movie' or 'show'."
+      - name: release_year
+        description: Year of release.
+      - name: release_date
+        description: Full release date. May be null.
+      - name: runtime
+        description: Runtime in minutes. May be null.
+      - name: original_language
+        description: ISO 639-1 language code of original production.
+      - name: imdb_score
+        description: IMDB user rating (0.0–10.0). May be null.
+      - name: imdb_votes
+        description: IMDB vote count. Used as licensing cost proxy.
+      - name: genre_tmdb
+        description: ARRAY of TMDB genres from base_objects.
+      - name: poster_jw
+        description: JustWatch poster image URL.
+      - name: total_page_views
+        description: Total page views for this title across the observation period.
+      - name: total_title_clicks
+        description: Total title_clicked interaction events.
+      - name: total_watchlist_adds
+        description: Total watchlist_add events.
+      - name: total_seenlist_adds
+        description: Total seenlist_add events.
+      - name: total_likes
+        description: Total likelist_add events.
+      - name: total_trailer_plays
+        description: Total youtube_started (trailer play) events.
+      - name: total_avod_clickouts
+        description: Total clickout events with se_action in ('free', 'ads').
+      - name: total_rent_clickouts
+        description: Total rent clickout events.
+      - name: total_buy_clickouts
+        description: Total buy clickout events.
+      - name: total_cinema_clickouts
+        description: Total cinema clickout events.
+      - name: total_tvod_clickouts
+        description: Total TVOD clickout events (rent + buy + cinema combined).
+      - name: total_svod_clickouts
+        description: Total SVOD clickout events (flatrate + sports).
+      - name: total_user_engagements
+        description: Sum of daily unique user counts. Treats this as engagement-days — cross-day users are double-counted.
+      - name: active_days
+        description: Count of distinct event dates with demand signals for this title.
+      - name: market_count
+        description: Count of distinct markets (app_locale values) where this title has any demand.
+      - name: has_avod_supply
+        description: Whether any AVOD (free/ads) supply was observed via clickout events.
+      - name: has_tvod_supply
+        description: Whether any TVOD (rent/buy/cinema) supply was observed via clickout events.
+      - name: has_svod_supply
+        description: Whether any SVOD (flatrate/sports) supply was observed via clickout events.
+      - name: avod_provider_count
+        description: Count of distinct AVOD providers with observed supply for this title.
+      - name: tvod_provider_count
+        description: Count of distinct TVOD providers with observed supply for this title.
+      - name: svod_provider_count
+        description: Count of distinct SVOD providers with observed supply for this title.
+      - name: total_provider_count
+        description: Count of all distinct providers with observed supply for this title.
+      - name: avod_raw_score
+        description: >
+          Weighted AVOD engagement score:
+          (page_views×1) + (title_clicks×2) + (watchlist_adds×5) + (seenlist_adds×3)
+          + (likes×4) + (trailer_plays×2) + (avod_clickouts×10).
+      - name: tvod_raw_score
+        description: >
+          Weighted TVOD transactional intent score:
+          (rent_clickouts×10) + (buy_clickouts×8) + (cinema_clickouts×6).
+      - name: cost_tier
+        description: "Estimated licensing cost tier based on recency and popularity: 'premium', 'mid_tier', 'catalog', 'low_cost'."
+      - name: cost_multiplier
+        description: >
+          Numeric cost multiplier for ROI division. Ranges from 1.0 (low_cost) to 4.0 × 1.5 (premium movie).
+          Movies carry a 1.5× uplift over shows at the same popularity tier.
+      - name: avod_roi_score
+        description: avod_raw_score / cost_multiplier. Use to rank AVOD licensing candidates.
+      - name: tvod_roi_score
+        description: tvod_raw_score / cost_multiplier. Use to rank TVOD licensing candidates.
+      - name: avod_score_market_adjusted
+        description: avod_raw_score × (1 + (market_count - 1) × 0.1). Adjusts AVOD score upward for titles with cross-market demand.
+      - name: is_avod_underserved
+        description: True when avod_raw_score > 0 and no AVOD supply was observed. Licensing gap flag.
+      - name: is_tvod_underserved
+        description: True when tvod_raw_score > 0 and no TVOD supply was observed. Licensing gap flag.
+      - name: licensing_recommendation
+        description: >
+          Primary licensing direction derived from ROI scores:
+          'avod_priority' (AVOD ROI >= TVOD ROI), 'tvod_priority', or 'low_priority' (no demand).
+      - name: demand_rank
+        description: Rank by (avod_raw_score + tvod_raw_score) descending. Overall popularity rank.
+      - name: avod_roi_rank
+        description: Rank by avod_roi_score descending. Use to find best-value AVOD candidates.
+      - name: tvod_roi_rank
+        description: Rank by tvod_roi_score descending. Use to find best-value TVOD candidates.
+
+  - name: fct_title_seasonality
+    description: >
+      Weekly demand trends per title over the November 2025 – January 2026 window.
+      Grain: one row per (title_entity_id, week_start).
+      Sources from base_events_t3 (3-month window required for seasonal patterns;
+      T1 covers December only and will not show seasonal variation).
+      Includes a holiday window flag (Dec 20 – Jan 6) and week-over-week AVOD score change.
+      Use to identify holiday demand spikes and inform seasonal licensing decisions.
+      Recommended warehouse: WH_TEAM_<N>_S or larger.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: title_entity_id
+        description: JustWatch content ID. Composite primary key with week_start.
+        data_tests:
+          - not_null
+      - name: week_start
+        description: First day of the ISO week. Composite primary key with title_entity_id.
+        data_tests:
+          - not_null
+      - name: title
+        description: Display title in English from base_objects.
+      - name: object_type
+        description: "Content type: 'movie' or 'show'."
+      - name: release_year
+        description: Year of release from base_objects.
+      - name: original_language
+        description: ISO 639-1 language code of original production.
+      - name: genre_tmdb
+        description: ARRAY of TMDB genres from base_objects.
+      - name: page_views
+        description: Count of page_view events for this title in this week.
+      - name: watchlist_adds
+        description: Count of watchlist_add events for this title in this week.
+      - name: avod_clickouts
+        description: Count of AVOD clickout events (free/ads) for this title in this week.
+      - name: rent_clickouts
+        description: Count of rent clickout events for this title in this week.
+      - name: buy_clickouts
+        description: Count of buy and cinema clickout events for this title in this week.
+      - name: tvod_clickouts
+        description: Count of all TVOD clickout events for this title in this week.
+      - name: svod_clickouts
+        description: Count of SVOD clickout events for this title in this week.
+      - name: unique_users
+        description: Count of distinct users who engaged with this title in this week.
+      - name: market_count
+        description: Count of distinct app_locale values for this title in this week.
+      - name: weekly_avod_score
+        description: "Weighted AVOD score for the week: (page_views×1) + (watchlist_adds×5) + (avod_clickouts×10)."
+      - name: weekly_tvod_score
+        description: "Weighted TVOD score for the week: (rent_clickouts×10) + (buy_clickouts×8)."
+      - name: is_holiday_window
+        description: True when week_start falls within December 20 – January 6 (Christmas/New Year window).
+      - name: avod_score_wow_change
+        description: weekly_avod_score minus the prior week's weekly_avod_score. Null for the first week per title.
+
+  - name: fct_user_segments
+    description: >
+      Behavioural segmentation of all users with normalised intent scores.
+      Grain: one row per user_id.
+      Assigns each user to one of five segments using rule-based logic (proxy for K-means clustering):
+        whale       — top-quartile TVOD intent (high rent/buy clickouts per active day),
+        binger      — top-quartile AVOD intent (high page views / watchlist / free clickouts per active day),
+        churn_risk  — previously active, recent engagement dropped >50% (churn overrides other segments),
+        casual      — below top-quartile on both intent types but ≥2 events,
+        dormant     — fewer than 2 total events.
+      Segments feed fct_segment_title_demand and fct_title_acquisition_priority.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: user_id
+        description: Anonymous device/browser ID. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: login_id
+        description: JustWatch login ID if the user was ever logged in. NULL if always anonymous.
+      - name: primary_market
+        description: Most-used app_locale for this user. May be null if no market signal was observed.
+      - name: first_seen_date
+        description: Earliest event date for this user in the dataset.
+      - name: last_seen_date
+        description: Most recent event date for this user in the dataset.
+      - name: active_days
+        description: Count of distinct calendar dates on which this user was active.
+      - name: total_sessions
+        description: Count of distinct session_ids for this user.
+      - name: total_events
+        description: Total count of all events for this user.
+      - name: unique_titles_engaged
+        description: Count of distinct content titles this user interacted with.
+      - name: title_page_views
+        description: Count of page_view events on content title pages.
+      - name: watchlist_adds
+        description: Count of watchlist_add events.
+      - name: avod_clickouts
+        description: Count of AVOD clickout events (free/ads).
+      - name: rent_clickouts
+        description: Count of rent clickout events.
+      - name: buy_clickouts
+        description: Count of buy clickout events.
+      - name: svod_clickouts
+        description: Count of SVOD clickout events (flatrate/sports).
+      - name: early_period_events
+        description: Event count from December 1–14. Used for churn risk detection.
+      - name: recent_period_events
+        description: Event count from December 15–31. Compared against early_period_events to detect drop-off.
+      - name: churn_risk_flag
+        description: >
+          True when the recent daily event rate is less than 50% of the early daily rate
+          AND the user had ≥3 events in the early period. Low-signal users are excluded.
+      - name: avod_intent_score
+        description: Normalised AVOD intent score (0–100). Computed as avod_intent_raw / max(avod_intent_raw) × 100, capped at 100.
+      - name: tvod_intent_score
+        description: Normalised TVOD intent score (0–100). Computed as tvod_intent_raw / max(tvod_intent_raw) × 100, capped at 100.
+      - name: user_segment
+        description: >
+          Behavioural segment label. Churn_risk overrides positive intent signals.
+          Values: 'whale', 'binger', 'churn_risk', 'casual', 'dormant'.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['whale', 'binger', 'churn_risk', 'casual', 'dormant']

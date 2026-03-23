@@ -8,7 +8,7 @@
 
 with events as (
     select *
-    from {{ ref('base_events_t3') }}
+    from {{ ref('int_events_t3') }}
     where title_entity_id is not null
 ),
 
@@ -44,8 +44,7 @@ weekly as (
 
 objects as (
     select object_id, title, object_type, release_year, original_language, genre_tmdb
-    from {{ ref('base_objects') }}
-    where title_id = object_id      -- top-level titles only
+    from {{ ref('int_objects_enriched') }}
 )
 
 select

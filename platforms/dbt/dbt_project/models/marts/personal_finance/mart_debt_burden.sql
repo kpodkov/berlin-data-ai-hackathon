@@ -8,7 +8,7 @@ with monthly_raw as (
         max(case when series_id = 'REVOLSL' then value end) as revolving_credit,
         max(case when series_id = 'NONREVSL' then value end) as nonrevolving_credit,
         max(case when series_id = 'TDSP' then value end) as debt_service_ratio
-    from {{ ref('stg_fred_timeseries') }}
+    from {{ ref('int_fred_topic_classified') }}
     where topic in ('debt', 'rates')
     group by 1
 ),

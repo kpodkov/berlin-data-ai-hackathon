@@ -8,8 +8,6 @@ staged as (
         title,
         units,
         frequency,
-        seasonal_adjustment,
-        last_updated::timestamp_ntz as last_updated_at,
         category,
         'fred'              as _source,
         current_timestamp() as _loaded_at

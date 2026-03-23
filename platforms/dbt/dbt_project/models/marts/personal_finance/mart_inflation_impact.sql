@@ -8,7 +8,7 @@ with cpi_monthly as (
         max(case when series_id = 'CUSR0000SAE1' then value end) as cpi_education,
         max(case when series_id = 'CUUR0000SAT1' then value end) as cpi_transportation,
         max(case when series_id = 'CUSR0000SEHA' then value end) as cpi_rent
-    from {{ ref('stg_fred_timeseries') }}
+    from {{ ref('int_fred_topic_classified') }}
     where topic in ('cpi', 'housing')
     group by 1
 ),
