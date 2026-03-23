@@ -1,6 +1,6 @@
 -- Daily market prices enriched with metadata, asset class label, and daily return.
 -- Grain: one row per (series_id, obs_date).
--- Joins base_market_prices + base_market_metadata, computes daily_return via LAG(),
+-- Joins stg_market_prices + stg_market_metadata, computes daily_return via LAG(),
 -- and maps each ticker to a human-readable asset_class bucket.
 {{ config(materialized='table', schema='intermediate') }}
 
@@ -9,14 +9,14 @@ with prices as (
         series_id,
         obs_date,
         value
-    from {{ ref('base_market_prices') }}
+    from {{ ref('stg_market_prices') }}
 ),
 
 metadata as (
     select
         series_id,
         title
-    from {{ ref('base_market_metadata') }}
+    from {{ ref('stg_market_metadata') }}
 ),
 
 final as (

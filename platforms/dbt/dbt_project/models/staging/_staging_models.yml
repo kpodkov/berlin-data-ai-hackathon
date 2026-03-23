@@ -16,8 +16,8 @@ models:
       - name: series_id
         data_tests: [unique, not_null]
 
-  - name: stg_fred_timeseries
-    description: "Pure source mirror of FRED_OBSERVATIONS. One row per (series_id, obs_date). Business logic (topic classification, metadata join) lives in int_fred_topic_classified."
+  - name: stg_ecb_observations
+    description: "Pure source mirror of ECB monthly exchange rate observations. One row per (series_id, obs_date). 30 EUR/FX series from the European Central Bank."
     columns:
       - name: series_id
         data_tests: [not_null]
@@ -25,20 +25,30 @@ models:
         data_tests: [not_null]
       - name: value
 
-  - name: stg_market_returns
-    description: "Pure source mirror of MARKET_PRICES. One row per (series_id, obs_date). Business logic (asset_class, daily_return, metadata join) lives in int_market_daily_returns."
+  - name: stg_ecb_metadata
+    description: "ECB series catalogue. One row per series_id. 30 EUR/FX exchange rate series."
     columns:
       - name: series_id
-        data_tests: [not_null]
-      - name: obs_date
-        data_tests: [not_null]
-      - name: value
+        data_tests: [unique, not_null]
 
-  - name: stg_worldbank_countries
-    description: "Pure source mirror of WORLDBANK_INDICATORS. One row per (series_id, obs_date). Business logic (label lookups, metadata join) lives in int_worldbank_enriched."
+  - name: stg_user_financial_profiles
+    description: "Pre-computed user financial profiles derived from JustWatch behavioral signals. One row per user_id. financial_score proxies wealth; tvod_propensity proxies discretionary spending willingness."
     columns:
-      - name: series_id
+      - name: user_id
+        data_tests: [not_null, unique]
+      - name: segment
         data_tests: [not_null]
-      - name: obs_date
+      - name: financial_score
+
+  - name: stg_user_financial_advice
+    description: "AI-generated per-user financial advice. One row per user_id (subset of users who received personalised advice — ~50K rows)."
+    columns:
+      - name: user_id
         data_tests: [not_null]
-      - name: value
+      - name: financial_advice
+
+  - name: stg_segment_intelligence
+    description: "Aggregated segment statistics with AI-generated insights. One row per segment (10 rows)."
+    columns:
+      - name: segment
+        data_tests: [not_null, unique]

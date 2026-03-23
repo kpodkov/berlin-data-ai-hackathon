@@ -1,6 +1,6 @@
 -- World Bank observations enriched with parsed codes, human-readable labels, and metadata.
 -- Grain: one row per (indicator_code, country_code, obs_date).
--- Joins base_worldbank_indicators + base_worldbank_metadata and resolves indicator and
+-- Joins stg_worldbank_indicators + stg_worldbank_metadata and resolves indicator and
 -- country codes to human-readable names via CASE expressions.
 {{ config(materialized='table', schema='intermediate') }}
 
@@ -12,14 +12,14 @@ with indicators as (
         reference_year,
         obs_date,
         value
-    from {{ ref('base_worldbank_indicators') }}
+    from {{ ref('stg_worldbank_indicators') }}
 ),
 
 metadata as (
     select
         series_id,
         title
-    from {{ ref('base_worldbank_metadata') }}
+    from {{ ref('stg_worldbank_metadata') }}
 ),
 
 final as (

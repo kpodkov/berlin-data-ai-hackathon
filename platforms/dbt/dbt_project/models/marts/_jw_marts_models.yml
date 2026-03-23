@@ -132,13 +132,13 @@ models:
         data_tests:
           - not_null
       - name: title
-        description: Display title in English from base_objects.
+        description: Display title in English from stg_objects.
       - name: object_type
         description: "Content type: 'movie' or 'show'."
       - name: release_year
-        description: Year of release from base_objects.
+        description: Year of release from stg_objects.
       - name: imdb_score
-        description: IMDB rating from base_objects. May be null.
+        description: IMDB rating from stg_objects. May be null.
       - name: page_views
         description: Count of page_view events by users in this segment for this title.
       - name: watchlist_adds
@@ -186,7 +186,7 @@ models:
           - not_null
           - unique
       - name: title
-        description: Display title in English from base_objects.
+        description: Display title in English from stg_objects.
       - name: original_title
         description: Title in the original production language.
       - name: object_type
@@ -204,7 +204,7 @@ models:
       - name: imdb_votes
         description: IMDB vote count. Used as licensing cost proxy.
       - name: genre_tmdb
-        description: ARRAY of TMDB genres from base_objects.
+        description: ARRAY of TMDB genres from stg_objects.
       - name: poster_jw
         description: JustWatch poster image URL.
       - name: cost_tier
@@ -323,7 +323,7 @@ models:
       - name: imdb_votes
         description: IMDB vote count. Used as licensing cost proxy.
       - name: genre_tmdb
-        description: ARRAY of TMDB genres from base_objects.
+        description: ARRAY of TMDB genres from stg_objects.
       - name: poster_jw
         description: JustWatch poster image URL.
       - name: total_page_views
@@ -410,7 +410,7 @@ models:
     description: >
       Weekly demand trends per title over the November 2025 – January 2026 window.
       Grain: one row per (title_entity_id, week_start).
-      Sources from base_events_t3 (3-month window required for seasonal patterns;
+      Sources from stg_events_t3 (3-month window required for seasonal patterns;
       T1 covers December only and will not show seasonal variation).
       Includes a holiday window flag (Dec 20 – Jan 6) and week-over-week AVOD score change.
       Use to identify holiday demand spikes and inform seasonal licensing decisions.
@@ -430,15 +430,15 @@ models:
         data_tests:
           - not_null
       - name: title
-        description: Display title in English from base_objects.
+        description: Display title in English from stg_objects.
       - name: object_type
         description: "Content type: 'movie' or 'show'."
       - name: release_year
-        description: Year of release from base_objects.
+        description: Year of release from stg_objects.
       - name: original_language
         description: ISO 639-1 language code of original production.
       - name: genre_tmdb
-        description: ARRAY of TMDB genres from base_objects.
+        description: ARRAY of TMDB genres from stg_objects.
       - name: page_views
         description: Count of page_view events for this title in this week.
       - name: watchlist_adds

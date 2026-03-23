@@ -2,7 +2,7 @@
 -- Resamples daily Yahoo Finance prices to monthly closes, then computes
 -- return and risk metrics for each instrument.
 --
--- Sources: base_market_prices (daily prices), base_market_metadata (labels)
+-- Sources: stg_market_prices (daily prices), stg_market_metadata (labels)
 -- Used by: financial advisor dashboard marts
 {{ config(materialized='table', schema='intermediate') }}
 
@@ -16,7 +16,7 @@ monthly_prices as (
         date_trunc('month', obs_date)::date as month_date,
         obs_date                            as last_trade_date,
         value                               as monthly_close
-    from {{ ref('base_market_prices') }}
+    from {{ ref('stg_market_prices') }}
     where value is not null
     qualify
         row_number() over (
@@ -59,7 +59,7 @@ with_metadata as (
         md.source
 
     from monthly_prices as mp
-    left join {{ ref('base_market_metadata') }} as md
+    left join {{ ref('stg_market_metadata') }} as md
         on mp.series_id = md.series_id
 ),
 

@@ -1,7 +1,7 @@
 -- Grain: one row per genre
 -- Answers: which genres perform best for AVOD (high volume, rewatchable)
 -- vs TVOD (premium, event-driven)?
--- Uses LATERAL FLATTEN to expand the genre_tmdb array from base_objects.
+-- Uses LATERAL FLATTEN to expand the genre_tmdb array from stg_objects.
 -- Titles appear once per genre they belong to (e.g. a Drama/Thriller counts for both).
 {{ config(materialized='table') }}
 

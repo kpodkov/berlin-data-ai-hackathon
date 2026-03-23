@@ -75,7 +75,7 @@ models:
     description: >
       Monthly returns, rolling volatility, drawdowns, and Sharpe ratios per instrument.
       Grain: one row per (series_id, month_date). Resampled from daily prices to monthly
-      (last closing price per month). Covers 13 instruments from base_market_prices.
+      (last closing price per month). Covers 13 instruments from stg_market_prices.
       Sharpe ratio uses annualized 12-month return / annualized 12-month vol (no risk-free rate).
     config:
       meta:
@@ -92,7 +92,7 @@ models:
         data_tests:
           - not_null
       - name: title
-        description: Instrument name from base_market_metadata.
+        description: Instrument name from stg_market_metadata.
       - name: asset_class
         description: >
           Derived asset class grouping: US Equity, US Equity (Growth), Energy, US Bonds,
@@ -238,7 +238,7 @@ models:
   - name: int_market_daily_returns
     description: >
       Daily market prices enriched with metadata, asset class label, and daily return.
-      Grain: one row per (series_id, obs_date). Joins base_market_prices with base_market_metadata
+      Grain: one row per (series_id, obs_date). Joins stg_market_prices with stg_market_metadata
       and computes daily_return via LAG(). Used by mart_investment_performance.
     config:
       meta:
@@ -257,7 +257,7 @@ models:
       - name: value
         description: Adjusted closing price (USD).
       - name: title
-        description: Instrument name from base_market_metadata.
+        description: Instrument name from stg_market_metadata.
       - name: asset_class
         description: "Asset class bucket: equity, bond, commodity, crypto, real_estate, currency, or other."
       - name: daily_return
@@ -269,7 +269,7 @@ models:
     description: >
       World Bank observations enriched with parsed indicator/country codes, human-readable labels,
       and title from metadata. Grain: one row per (indicator_code, country_code, obs_date).
-      Joins base_worldbank_indicators + base_worldbank_metadata. Used by mart_global_comparison.
+      Joins stg_worldbank_indicators + stg_worldbank_metadata. Used by mart_global_comparison.
     config:
       meta:
         contains_pii: no
@@ -297,4 +297,62 @@ models:
       - name: value
         description: Indicator value in native units. Null when data is unavailable for that country-year.
       - name: title
-        description: Series title from base_worldbank_metadata.
+        description: Series title from stg_worldbank_metadata.
+
+  - name: int_ecb_exchange_rates
+    description: >
+      Monthly ECB EUR/FX exchange rates enriched with metadata and YoY change.
+      Grain: one row per (series_id, month_date). 30 EUR/FX pairs from the European Central Bank.
+      Includes trend_direction signal (EUR Strengthening / Stable / EUR Weakening).
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: series_id
+        description: ECB series identifier. Composite primary key with month_date.
+        data_tests: [not_null]
+      - name: month_date
+        description: First day of the calendar month. Composite primary key with series_id.
+        data_tests: [not_null]
+      - name: title
+        description: Human-readable pair name (e.g. "EUR/USD Exchange Rate (monthly avg)").
+      - name: value
+        description: EUR exchange rate value for the period.
+      - name: yoy_change_pct
+        description: Year-over-year percentage change in the exchange rate.
+      - name: trend_direction
+        description: EUR trend signal — EUR Strengthening, Stable, or EUR Weakening.
+
+  - name: int_user_wealth_proxy
+    description: >
+      User wealth profile derived from JustWatch behavioral signals.
+      Grain: one row per user_id. Maps financial_score → wealth_tier (Budget/Middle/Affluent/Premium),
+      tvod_propensity → spending_willingness, and wealth_tier → macro_focus (which macro indicators
+      are most relevant for this user). Joins with AI-generated financial_advice and segment ai_insight.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: user_id
+        description: Anonymous JustWatch user identifier. Primary key.
+        data_tests: [not_null, unique]
+      - name: wealth_tier
+        description: Derived tier from financial_score. Values — Premium, Affluent, Middle, Budget.
+        data_tests:
+          - accepted_values:
+              values: ['Premium', 'Affluent', 'Middle', 'Budget']
+      - name: spending_willingness
+        description: Derived from tvod_propensity and is_free_only.
+        data_tests:
+          - accepted_values:
+              values: ['Free Only', 'High Spender', 'Moderate Spender', 'Low Spender']
+      - name: macro_focus
+        description: Which macro indicators are most relevant for this wealth tier.
+      - name: financial_advice
+        description: AI-generated financial advice text (null if not generated for this user).
+      - name: ai_insight
+        description: Segment-level AI insight from stg_segment_intelligence.

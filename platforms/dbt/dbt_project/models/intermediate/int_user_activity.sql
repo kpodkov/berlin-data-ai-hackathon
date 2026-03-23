@@ -8,7 +8,7 @@
 
 with events as (
     select *
-    from {{ ref('base_events_t1') }}
+    from {{ ref('stg_events_t1') }}
     where user_id is not null
 ),
 

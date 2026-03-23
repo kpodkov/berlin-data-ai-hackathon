@@ -6,7 +6,7 @@ models:
       Daily demand signal aggregates per top-level content title.
       Grain: one row per (title_entity_id, event_date).
       Aggregates page views, watchlist/seenlist/like actions, trailer plays, and clickout intents
-      (AVOD, TVOD, SVOD) from base_events_t1 into counts per day.
+      (AVOD, TVOD, SVOD) from stg_events_t1 into counts per day.
       Source is T1 (Germany/December); change the ref to scale to T2–T4.
       Used by fct_title_licensing_score (rolled up to title total)
       and fct_title_seasonality (rolled up to weekly).
@@ -17,7 +17,7 @@ models:
         layer: intermediate
     columns:
       - name: title_entity_id
-        description: JustWatch content ID. Composite primary key with event_date. Join to base_objects.object_id.
+        description: JustWatch content ID. Composite primary key with event_date. Join to stg_objects.object_id.
         data_tests:
           - not_null
       - name: event_date
@@ -121,7 +121,7 @@ models:
         data_tests:
           - not_null
       - name: provider_id
-        description: Provider ID from clickout events. Composite primary key with title_entity_id and monetization_type. Join to base_packages.provider_id.
+        description: Provider ID from clickout events. Composite primary key with title_entity_id and monetization_type. Join to stg_packages.provider_id.
         data_tests:
           - not_null
       - name: monetization_type
@@ -133,9 +133,9 @@ models:
       - name: clickout_count
         description: Total number of clickout events to this provider for this title under this monetization type.
       - name: provider_technical_name
-        description: Provider technical slug from base_packages (e.g. 'netflix'). May be null if provider not in packages.
+        description: Provider technical slug from stg_packages (e.g. 'netflix'). May be null if provider not in packages.
       - name: provider_clear_name
-        description: Provider display name from base_packages (e.g. 'Netflix'). May be null if provider not in packages.
+        description: Provider display name from stg_packages (e.g. 'Netflix'). May be null if provider not in packages.
       - name: monetization_bucket
         description: >
           Grouped monetization category:
@@ -143,7 +143,7 @@ models:
 
   - name: int_user_activity
     description: >
-      Per-user behavioral feature matrix aggregated from base_events_t1.
+      Per-user behavioral feature matrix aggregated from stg_events_t1.
       Grain: one row per user_id.
       Covers all December 2025 activity for Germany, split into early (Dec 1–14) vs
       recent (Dec 15–31) periods to enable churn risk detection via engagement drop-off.

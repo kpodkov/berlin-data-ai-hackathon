@@ -11,7 +11,7 @@
 
 with events as (
     select *
-    from {{ ref('base_events_t1') }}
+    from {{ ref('stg_events_t1') }}
     where title_entity_id is not null
       and app_locale is not null      -- exclude events with no market signal
 )

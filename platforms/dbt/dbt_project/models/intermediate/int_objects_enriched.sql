@@ -1,5 +1,5 @@
 -- Grain: one row per top-level title (movie or show)
--- Filters base_objects to top-level titles only (title_id = object_id).
+-- Filters stg_objects to top-level titles only (title_id = object_id).
 -- Exposes all metadata columns needed by mart models.
 --
 -- Used by: fct_segment_title_demand, fct_title_seasonality,
@@ -50,5 +50,5 @@ select
     poster_jw,
     trailers
 
-from {{ ref('base_objects') }}
+from {{ ref('stg_objects') }}
 where title_id = object_id      -- top-level titles only (movies and shows, not seasons/episodes)

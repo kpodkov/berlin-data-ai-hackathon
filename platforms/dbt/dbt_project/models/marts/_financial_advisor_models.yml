@@ -184,3 +184,70 @@ models:
         description: Always 'Illustrative only — uses finalized historical data. Not investment advice.'
       - name: _loaded_at
         description: Timestamp when this model was last built (UTC).
+
+  - name: mart_personalized_advisor
+    description: >
+      Per-user personalized financial advisor output. Grain: one row per (user_id, macro_series_id).
+      Each user sees 3 macro signals relevant to their wealth tier, with a personalized_action recommendation.
+      Combines int_user_wealth_proxy (behavioral wealth proxy) with fct_market_environment (macro regime).
+      macro_focus drives which 3 FRED series are retained per user:
+        'Market Performance & Rates' -> SP500, DGS10, FEDFUNDS
+        'Inflation & Employment'     -> CPIAUCSL, UNRATE, GDPC1
+        'Inflation & Savings'        -> CPIAUCSL, PSAVERT, UNRATE
+      DISCLAIMER: Illustrative only — uses finalized historical data. Not investment advice.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: user_id
+        description: Anonymous JustWatch user identifier.
+        data_tests:
+          - not_null
+      - name: segment
+        description: User segment label from the financial profiling model.
+      - name: wealth_tier
+        description: Premium / Affluent / Middle / Budget — derived from financial_score.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['Premium', 'Affluent', 'Middle', 'Budget']
+      - name: spending_willingness
+        description: High Spender / Moderate Spender / Low Spender / Free Only — derived from tvod_propensity and is_free_only.
+      - name: macro_focus
+        description: Which macro domain is most relevant for this user's wealth tier.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['Market Performance & Rates', 'Inflation & Employment', 'Inflation & Savings']
+      - name: financial_score
+        description: Composite financial score (0–100) driving wealth_tier and macro_focus.
+      - name: macro_series_id
+        description: FRED series identifier for the matched macro indicator.
+        data_tests:
+          - not_null
+      - name: macro_title
+        description: Human-readable name of the matched macro indicator.
+      - name: macro_signal_color
+        description: Traffic-light signal for the relevant macro indicator (green/yellow/red).
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+      - name: regime_label
+        description: Regime classification for the macro indicator (Elevated, Normal, Depressed, Insufficient data).
+      - name: macro_value
+        description: Latest observed value for the matched macro indicator.
+      - name: as_of_period
+        description: YYYY-MM period of the macro observation.
+      - name: personalized_action
+        description: Plain-English recommendation based on wealth tier + macro signal_color.
+        data_tests:
+          - not_null
+      - name: financial_advice
+        description: Pre-generated financial advice text from the user financial advice seed.
+      - name: ai_insight
+        description: Segment-level AI-generated insight from the segment intelligence seed.
+      - name: _loaded_at
+        description: Timestamp when this model was last built (UTC).

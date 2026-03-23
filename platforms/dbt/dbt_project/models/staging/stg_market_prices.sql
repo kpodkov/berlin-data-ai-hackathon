@@ -2,7 +2,7 @@
 -- Bronze layer: faithful copy of the raw ingestion table with audit metadata added.
 -- One row per (series_id, obs_date). Values are adjusted closing prices in USD.
 -- See _market_sources.yml for full series catalogue and date coverage per instrument.
-{{ config(materialized='table', schema='base') }}
+{{ config(materialized='view') }}
 
 with source as (
     select * from {{ source('raw', 'MARKET_PRICES') }}

@@ -3,12 +3,12 @@
 -- Used by: fct_title_licensing_score (rolled up to title total)
 --          fct_title_seasonality (rolled up to weekly)
 --
--- Source: base_events_t1 (prototype — change to t2/t3 to scale)
+-- Source: stg_events_t1 (prototype — change to t2/t3 to scale)
 {{ config(materialized='table') }}
 
 with events as (
     select *
-    from {{ ref('base_events_t1') }}
+    from {{ ref('stg_events_t1') }}
     where title_entity_id is not null
 )
 

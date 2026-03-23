@@ -17,7 +17,7 @@ with clickouts as (
         clickout_monetization_type              as monetization_type,
         count(distinct user_id)                 as unique_users_clicking,
         count(*)                                as clickout_count
-    from {{ ref('base_events_t1') }}
+    from {{ ref('stg_events_t1') }}
     where se_category = 'clickout'
       and title_entity_id is not null
       and clickout_provider_id is not null
@@ -42,5 +42,5 @@ select
     end                         as monetization_bucket
 
 from clickouts c
-left join {{ ref('base_packages') }} p
+left join {{ ref('stg_packages') }} p
     on c.provider_id = p.provider_id

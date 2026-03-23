@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: mart_currency_environment
+    description: >
+      Latest EUR/FX exchange rate snapshot per currency pair with traffic-light signal.
+      Grain: one row per series_id. 30 ECB EUR/FX pairs.
+      signal_color: green = EUR strengthening, red = EUR weakening, yellow = stable.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: mart
+    columns:
+      - name: series_id
+        description: ECB series identifier. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: title
+        description: Human-readable series title from ECB metadata.
+      - name: category
+        description: Currency pair category derived from ECB metadata.
+      - name: month_date
+        description: First day of the latest observation month.
+      - name: as_of_period
+        description: YYYY-MM label of the latest observation month.
+        data_tests:
+          - not_null
+      - name: value
+        description: EUR/FX exchange rate for the latest month.
+      - name: yoy_change_pct
+        description: Year-over-year percentage change in the exchange rate.
+      - name: trend_direction
+        description: Trend label — EUR Strengthening, EUR Weakening, or Stable.
+      - name: signal_color
+        description: Traffic light — green (EUR strengthening), yellow (stable), red (EUR weakening).
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+      - name: _loaded_at
+        description: Timestamp when this row was last materialized.
