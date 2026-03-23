@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: advisor_current_snapshot
+    description: "Latest values from all 6 personal finance marts. Single row with all key metrics."
+  - name: advisor_summaries
+    description: "Cortex AI-generated plain-English summaries per personal finance topic. 7 rows: 6 topics + 1 headline."
+    columns:
+      - name: topic
+        description: "Topic: inflation, housing, savings, debt, investments, global, headline"
+      - name: summary_text
+        description: "LLM-generated 3-sentence summary in plain English"
+      - name: generated_at
+        description: "Timestamp when the summary was generated"

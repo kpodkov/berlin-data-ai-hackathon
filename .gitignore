@@ -1,6 +1,10 @@
 # Claude Code — personal/local settings
 .claude/settings.local.json
 
+# Environment secrets
+.env
+.env.*
+
 # Logs
 logs/
 *.log

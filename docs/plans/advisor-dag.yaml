@@ -1,0 +1,82 @@
+tasks:
+  # Wave 0: Staging views (all independent)
+  - id: t1
+    title: "Create FRED staging view"
+    agent: developer
+    depends_on: []
+    output: "DB_TEAM_3.STAGING.stg_fred_timeseries view"
+    files: ["scripts/sql/staging/"]
+
+  - id: t2
+    title: "Create Market staging view"
+    agent: developer
+    depends_on: []
+    output: "DB_TEAM_3.STAGING.stg_market_returns view"
+    files: ["scripts/sql/staging/"]
+
+  - id: t3
+    title: "Create World Bank staging view"
+    agent: developer
+    depends_on: []
+    output: "DB_TEAM_3.STAGING.stg_worldbank_countries view"
+    files: ["scripts/sql/staging/"]
+
+  # Wave 1: Mart tables (depend on staging)
+  - id: t4
+    title: "Create inflation impact mart"
+    agent: developer
+    depends_on: [t1]
+    output: "DB_TEAM_3.MARTS.mart_inflation_impact table"
+    files: ["scripts/sql/marts/"]
+
+  - id: t5
+    title: "Create housing affordability mart"
+    agent: developer
+    depends_on: [t1]
+    output: "DB_TEAM_3.MARTS.mart_housing_affordability table"
+    files: ["scripts/sql/marts/"]
+
+  - id: t6
+    title: "Create savings health mart"
+    agent: developer
+    depends_on: [t1, t2]
+    output: "DB_TEAM_3.MARTS.mart_savings_health table"
+    files: ["scripts/sql/marts/"]
+
+  - id: t7
+    title: "Create debt burden mart"
+    agent: developer
+    depends_on: [t1]
+    output: "DB_TEAM_3.MARTS.mart_debt_burden table"
+    files: ["scripts/sql/marts/"]
+
+  - id: t8
+    title: "Create investment performance mart"
+    agent: developer
+    depends_on: [t1, t2]
+    output: "DB_TEAM_3.MARTS.mart_investment_performance table"
+    files: ["scripts/sql/marts/"]
+
+  - id: t9
+    title: "Create global comparison mart"
+    agent: developer
+    depends_on: [t3]
+    output: "DB_TEAM_3.MARTS.mart_global_comparison table"
+    files: ["scripts/sql/marts/"]
+
+  # Wave 2: Cortex AI (depends on all marts)
+  - id: t10
+    title: "Create Cortex AI advisor summaries"
+    agent: developer
+    depends_on: [t4, t5, t6, t7, t8, t9]
+    output: "DB_TEAM_3.INSIGHTS.advisor_summaries table"
+    files: ["scripts/sql/insights/"]
+
+# Waves:
+#   Wave 0: t1, t2, t3         (staging - parallel)
+#   Wave 1: t4, t5, t6, t7, t8, t9  (marts - parallel)
+#   Wave 2: t10                 (cortex)
+#
+# Critical path: t1 -> t4 -> t10 (3 of 10 tasks, 30%)
+# Parallelism benefit: 10/3 = 3.3x
+# Recommendation: DAG dispatch

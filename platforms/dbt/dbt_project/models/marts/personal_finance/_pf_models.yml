@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: mart_inflation_impact
+    description: "Monthly CPI breakdown with YoY changes and purchasing power index. One row per month."
+  - name: mart_housing_affordability
+    description: "Housing metrics: home prices, mortgage payments, affordability ratios. One row per month."
+  - name: mart_savings_health
+    description: "Savings rate, real interest rates (after inflation). One row per month."
+  - name: mart_debt_burden
+    description: "Consumer debt metrics: credit card rates, mortgage rates, debt service ratio. One row per month."
+  - name: mart_investment_performance
+    description: "Asset class returns, drawdowns, rolling performance. One row per ticker per month."
+  - name: mart_global_comparison
+    description: "Country-level economic indicators for international comparison. One row per country per year."

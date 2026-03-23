@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: stg_fred_timeseries
+    description: "FRED economic time series with topic classification. One row per series-date observation."
+    columns:
+      - name: series_id
+        description: "FRED series identifier"
+      - name: obs_date
+        description: "Observation date"
+      - name: value
+        description: "Observed value in native units"
+      - name: topic
+        description: "Personal finance topic: income, savings, debt, housing, cpi, rates, market, wealth, macro"
+
+  - name: stg_market_returns
+    description: "Daily market prices with returns and asset class labels. One row per ticker-date."
+    columns:
+      - name: series_id
+        description: "Yahoo Finance ticker symbol"
+      - name: asset_class
+        description: "Asset class: equity, bond, commodity, crypto, real_estate, currency"
+      - name: daily_return
+        description: "Day-over-day return as decimal"
+
+  - name: stg_worldbank_countries
+    description: "World Bank indicators split by country. One row per indicator-country-year."
+    columns:
+      - name: indicator_code
+        description: "World Bank indicator code"
+      - name: country_code
+        description: "ISO3 country code"
+      - name: indicator_name
+        description: "Human-readable indicator name"
+      - name: country_name
+        description: "Human-readable country name"
