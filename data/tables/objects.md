@@ -5,12 +5,12 @@ Join with events via: `cc_title:jwEntityId::TEXT = objects.object_id`
 
 ---
 
-**Note**: Columns below reflect the proposed include list. Final set TBD after review.
+**Note**: 35 columns included. See Collate for interactive schema exploration.
 
 | # | Column | Type | Description |
 |---|--------|------|-------------|
 | 1 | `object_id` | VARCHAR | JustWatch content ID. Primary key. Prefix: "tm" = movie, "ts" = show, "tss" = season, "tse" = episode. Join with `cc_title:jwEntityId::TEXT`. |
-| 2 | `object_type` | VARCHAR | Content type: "movie", "show", "season", "episode" (also rare "MOVIE" uppercase). |
+| 2 | `object_type` | VARCHAR | Content type: "movie", "show", "show_season", "show_episode" (also rare "MOVIE" uppercase). |
 | 3 | `title_id` | VARCHAR | Top-level title ID. Same as object_id for movies/shows. Points to the parent show for seasons/episodes. |
 | 4 | `parent_id` | VARCHAR | For episodes: object_id of their season. For seasons: object_id of the show. NULL for movies/shows. |
 | 5 | `show_season_id` | VARCHAR | For episodes only: object_id of the season. NULL otherwise. |

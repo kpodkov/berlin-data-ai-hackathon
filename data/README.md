@@ -27,7 +27,7 @@ All data lives in `DB_JW_SHARED.CHALLENGE` (read-only, shared across all teams).
 | **T2** | 40M | 5.7 GB | 8 EU markets | Dec 2025 |
 | **T3** | 128M | 17.9 GB | 8 EU markets | Nov 25 – Jan 26 |
 | **T4** | 254M | 36.1 GB | 15 global markets | Nov – Dec 25 |
-| **OBJECTS** | 2.3M | 1.1 GB | — | — |
+| **OBJECTS** | 13M | 1.1 GB | — | — |
 | **PACKAGES** | 1,526 | — | — | — |
 
 **Start with T1** — it's small and fast. Validate your queries there, then swap the table name to scale up.
@@ -35,7 +35,7 @@ All data lives in `DB_JW_SHARED.CHALLENGE` (read-only, shared across all teams).
 ## Key things to know
 
 - **Deduplicate with `rid`**, not `event_id` — at-least-once delivery means rare duplicates exist
-- **Filter bots** — always include `cc_yauaa:deviceClass::TEXT NOT IN ('Robot', 'Spy', 'Hacker')`
-- **`appLocale` ≠ `geo_country`** — a German expat in France has `appLocale='de_DE'` but `geo_country='FR'`
-- **95% of events are `struct`** (structured events with `se_*` fields), only ~5% are `page_view`
+- **Filter bots** — `cc_yauaa:deviceClass::TEXT NOT IN ('Robot', 'Spy', 'Hacker')` returns no rows in the hackathon dataset (bots have been pre-filtered), but it's good practice to include
+- **`appLocale` ≠ `geo_country`** — a German expat in France has `appLocale='DE'` but `geo_country='FR'`
+- **Events are split between `struct`** (structured events with `se_*` fields) **and `page_view`**
 - **Context columns are VARIANT/OBJECT** — access nested fields with colon notation: `cc_title:jwEntityId::TEXT`

@@ -20,26 +20,22 @@ JOIN DB_JW_SHARED.CHALLENGE.OBJECTS o
 LIMIT 100;
 
 
--- Join events to the specific season/episode (when available)
--- For show events, cc_title carries seasonNumber and episodeNumber.
--- To find the exact season or episode in the objects table, match on
--- both the parent show ID and the season/episode numbers.
+-- Join events to the exact content row in OBJECTS (movie, show, or episode).
+-- title_id + season/episode IS NOT DISTINCT FROM handles all cases in one join:
+--   movies/shows: seasonNumber and episodeNumber are NULL, matches the top-level row
+--   episodes: matches the specific episode row via season + episode number
 SELECT
     e.collector_tstamp,
-    e.cc_title:jwEntityId::TEXT          AS show_id,
+    o.title,
+    o.object_type,
     e.cc_title:seasonNumber::INT         AS season_num,
-    e.cc_title:episodeNumber::INT        AS episode_num,
-    o.title                              AS show_title,
-    ep.title                             AS episode_title
+    e.cc_title:episodeNumber::INT        AS episode_num
 FROM DB_JW_SHARED.CHALLENGE.T1 e
 JOIN DB_JW_SHARED.CHALLENGE.OBJECTS o
-  ON e.cc_title:jwEntityId::TEXT = o.object_id
-LEFT JOIN DB_JW_SHARED.CHALLENGE.OBJECTS ep
-  ON ep.title_id = o.object_id
-  AND ep.object_type = 'episode'
-  AND ep.season_number IS NOT DISTINCT FROM e.cc_title:seasonNumber::INT
-  AND ep.episode_number IS NOT DISTINCT FROM e.cc_title:episodeNumber::INT
-WHERE e.cc_title:objectType::TEXT = 'show_episode'
+  ON o.title_id = e.cc_title:jwEntityId::TEXT
+  AND o.season_number IS NOT DISTINCT FROM e.cc_title:seasonNumber::INT
+  AND o.episode_number IS NOT DISTINCT FROM e.cc_title:episodeNumber::INT
+WHERE e.cc_title:jwEntityId IS NOT NULL
 LIMIT 100;
 
 
