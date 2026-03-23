@@ -1,0 +1,79 @@
+chartConfig:
+  config:
+    columns:
+      fct_risk_monitor_action_text:
+        name: Interpretation & Action
+      fct_risk_monitor_category:
+        name: Category
+      fct_risk_monitor_overall_risk_label:
+        name: Overall Risk
+      fct_risk_monitor_risk_indicator:
+        frozen: true
+        name: Risk Indicator
+      fct_risk_monitor_traffic_light:
+        name: Signal
+    conditionalFormattings:
+      - applyTo: cell
+        color: "#10B981"
+        rules:
+          - id: green-risk
+            operator: equals
+            values:
+              - green
+        target:
+          fieldId: fct_risk_monitor_traffic_light
+      - applyTo: cell
+        color: "#F59E0B"
+        rules:
+          - id: yellow-risk
+            operator: equals
+            values:
+              - yellow
+        target:
+          fieldId: fct_risk_monitor_traffic_light
+      - applyTo: cell
+        color: "#EF4444"
+        rules:
+          - id: red-risk
+            operator: equals
+            values:
+              - red
+        target:
+          fieldId: fct_risk_monitor_traffic_light
+    hideRowNumbers: true
+    showColumnCalculation: false
+    showTableNames: false
+  type: table
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - fct_risk_monitor_risk_indicator
+    - fct_risk_monitor_category
+    - fct_risk_monitor_traffic_light
+    - fct_risk_monitor_action_text
+    - fct_risk_monitor_overall_risk_label
+  exploreName: fct_risk_monitor
+  filters: {}
+  limit: 10
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - descending: false
+      fieldId: fct_risk_monitor_traffic_light
+  tableCalculations: []
+name: Risk Monitor — Indicator Detail
+slug: fa-risk-table
+spaceSlug: financial-advisor
+tableConfig:
+  columnOrder:
+    - fct_risk_monitor_risk_indicator
+    - fct_risk_monitor_category
+    - fct_risk_monitor_traffic_light
+    - fct_risk_monitor_action_text
+    - fct_risk_monitor_overall_risk_label
+tableName: fct_risk_monitor
+version: 1

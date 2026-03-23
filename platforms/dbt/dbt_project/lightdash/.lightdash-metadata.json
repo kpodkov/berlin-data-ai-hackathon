@@ -1,14 +1,14 @@
 {
   "version": 1,
   "charts": {
-    "fa-env-green-count": "charts/chart-env-green-count.yml",
-    "fa-env-yellow-count": "charts/chart-env-yellow-count.yml",
-    "fa-env-red-count": "charts/chart-env-red-count.yml",
-    "fa-env-indicator-table": "charts/chart-env-indicator-table.yml",
-    "fa-risk-score": "charts/chart-risk-score.yml",
-    "fa-risk-table": "charts/chart-risk-table.yml"
+    "fa-env-green-count": "2026-03-23T14:20:24.064Z",
+    "fa-env-yellow-count": "2026-03-23T14:20:24.064Z",
+    "fa-env-red-count": "2026-03-23T14:20:24.064Z",
+    "fa-env-indicator-table": "2026-03-23T14:20:24.064Z",
+    "fa-risk-score": "2026-03-23T14:20:24.064Z",
+    "fa-risk-table": "2026-03-23T14:20:24.064Z"
   },
   "dashboards": {
-    "financial-advisor-dashboard": "dashboards/dashboard-financial-advisor.yml"
+    "financial-advisor-dashboard": "2026-03-23T14:20:24.394Z"
   }
 }

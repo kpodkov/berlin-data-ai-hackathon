@@ -1,0 +1,29 @@
+chartConfig:
+  config:
+    label: Green Signals
+    selectedField: fct_market_environment_count_green_signals
+    showBigNumberLabel: true
+  type: big_number
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions: []
+  exploreName: fct_market_environment
+  filters: {}
+  limit: 1
+  metricOverrides: {}
+  metrics:
+    - fct_market_environment_count_green_signals
+  sorts: []
+  tableCalculations: []
+name: Green Signals
+slug: fa-env-green-count
+spaceSlug: financial-advisor
+tableConfig:
+  columnOrder:
+    - fct_market_environment_count_green_signals
+tableName: fct_market_environment
+version: 1

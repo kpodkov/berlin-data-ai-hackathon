@@ -1,0 +1,138 @@
+config:
+  isAddFilterDisabled: false
+  isDateZoomDisabled: true
+contentType: dashboard
+description: >
+  Macro environment and risk monitor for financial advisors. Illustrative only —
+  uses finalized historical data. Not investment advice.
+filters:
+  dimensions: []
+  metrics: []
+  tableCalculations: []
+name: Financial Advisor Dashboard
+slug: financial-advisor-dashboard
+spaceSlug: financial-advisor
+tabs: []
+tiles:
+  - h: 1
+    properties:
+      showDivider: false
+      text: "📊 Section 1 — Market Environment: Where are we in the economic cycle?"
+    tabUuid: null
+    type: heading
+    w: 36
+    x: 0
+    "y": 0
+  - h: 4
+    properties:
+      chartName: Green Signals
+      chartSlug: fa-env-green-count
+      hideTitle: false
+      title: Green Signals
+    tabUuid: null
+    tileSlug: fa-env-green-count
+    type: saved_chart
+    w: 12
+    x: 0
+    "y": 1
+  - h: 4
+    properties:
+      chartName: Yellow Signals
+      chartSlug: fa-env-yellow-count
+      hideTitle: false
+      title: Yellow Signals
+    tabUuid: null
+    tileSlug: fa-env-yellow-count
+    type: saved_chart
+    w: 12
+    x: 12
+    "y": 1
+  - h: 4
+    properties:
+      chartName: Red Signals
+      chartSlug: fa-env-red-count
+      hideTitle: false
+      title: Red Signals
+    tabUuid: null
+    tileSlug: fa-env-red-count
+    type: saved_chart
+    w: 12
+    x: 24
+    "y": 1
+  - h: 10
+    properties:
+      chartName: Market Environment — Indicator Breakdown
+      chartSlug: fa-env-indicator-table
+      hideTitle: false
+      title: Macro Indicator Breakdown
+    tabUuid: null
+    tileSlug: fa-env-indicator-table
+    type: saved_chart
+    w: 36
+    x: 0
+    "y": 5
+  - h: 1
+    properties:
+      showDivider: false
+      text: "🚨 Section 4 — Risk Monitor: Should I be worried right now?"
+    tabUuid: null
+    type: heading
+    w: 36
+    x: 0
+    "y": 15
+  - h: 4
+    properties:
+      chartName: Overall Risk Score
+      chartSlug: fa-risk-score
+      hideTitle: false
+      title: Overall Risk Score
+    tabUuid: null
+    tileSlug: fa-risk-score
+    type: saved_chart
+    w: 12
+    x: 0
+    "y": 16
+  - h: 4
+    properties:
+      content: |
+        | Score | Label | Signal |
+        |-------|-------|--------|
+        | &lt; 30 | Low Risk | 🟢 |
+        | 30–59 | Moderate Risk | 🟡 |
+        | ≥ 60 | High Risk | 🔴 |
+
+        Score = AVG(red=100, yellow=50, green=0) across all risk indicators.
+      hideFrame: false
+      hideTitle: false
+      title: Risk Score Legend
+    tabUuid: null
+    type: markdown
+    w: 24
+    x: 12
+    "y": 16
+  - h: 10
+    properties:
+      chartName: Risk Monitor — Indicator Detail
+      chartSlug: fa-risk-table
+      hideTitle: false
+      title: Risk Indicator Detail
+    tabUuid: null
+    tileSlug: fa-risk-table
+    type: saved_chart
+    w: 36
+    x: 0
+    "y": 20
+  - h: 2
+    properties:
+      content: >
+        ⚠️ **Disclaimer:** Illustrative only — uses finalized historical data.
+        Not investment advice.
+      hideFrame: false
+      hideTitle: false
+      title: ""
+    tabUuid: null
+    type: markdown
+    w: 36
+    x: 0
+    "y": 30
+version: 1
