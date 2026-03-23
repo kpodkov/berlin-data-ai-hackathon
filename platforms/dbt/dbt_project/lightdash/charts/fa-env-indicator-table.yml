@@ -1,19 +1,19 @@
 chartConfig:
   config:
     columns:
-      fct_market_environment_as_of_period:
+      mart_market_environment_as_of_period:
         name: As Of
-      fct_market_environment_category:
+      mart_market_environment_category:
         frozen: true
         name: Category
-      fct_market_environment_indicator_name:
+      mart_market_environment_indicator_name:
         frozen: true
         name: Indicator
-      fct_market_environment_overall_environment:
+      mart_market_environment_overall_environment:
         name: Overall Environment
-      fct_market_environment_regime_label:
+      mart_market_environment_regime_label:
         name: Regime
-      fct_market_environment_signal_color:
+      mart_market_environment_signal_color:
         name: Signal
     conditionalFormattings:
       - applyTo: cell
@@ -24,7 +24,7 @@ chartConfig:
             values:
               - green
         target:
-          fieldId: fct_market_environment_signal_color
+          fieldId: mart_market_environment_signal_color
       - applyTo: cell
         color: "#F59E0B"
         rules:
@@ -33,7 +33,7 @@ chartConfig:
             values:
               - yellow
         target:
-          fieldId: fct_market_environment_signal_color
+          fieldId: mart_market_environment_signal_color
       - applyTo: cell
         color: "#EF4444"
         rules:
@@ -42,7 +42,7 @@ chartConfig:
             values:
               - red
         target:
-          fieldId: fct_market_environment_signal_color
+          fieldId: mart_market_environment_signal_color
     hideRowNumbers: true
     showColumnCalculation: false
     showTableNames: false
@@ -54,31 +54,31 @@ metricQuery:
   customDimensions: []
   dimensionOverrides: {}
   dimensions:
-    - fct_market_environment_category
-    - fct_market_environment_indicator_name
-    - fct_market_environment_signal_color
-    - fct_market_environment_regime_label
-    - fct_market_environment_as_of_period
-    - fct_market_environment_overall_environment
-  exploreName: fct_market_environment
+    - mart_market_environment_category
+    - mart_market_environment_indicator_name
+    - mart_market_environment_signal_color
+    - mart_market_environment_regime_label
+    - mart_market_environment_as_of_period
+    - mart_market_environment_overall_environment
+  exploreName: mart_market_environment
   filters: {}
   limit: 20
   metricOverrides: {}
   metrics: []
   sorts:
     - descending: false
-      fieldId: fct_market_environment_signal_color
+      fieldId: mart_market_environment_signal_color
   tableCalculations: []
 name: Market Environment — Indicator Breakdown
 slug: fa-env-indicator-table
-spaceSlug: financial-advisor
+spaceSlug: shared
 tableConfig:
   columnOrder:
-    - fct_market_environment_category
-    - fct_market_environment_indicator_name
-    - fct_market_environment_signal_color
-    - fct_market_environment_regime_label
-    - fct_market_environment_as_of_period
-    - fct_market_environment_overall_environment
-tableName: fct_market_environment
+    - mart_market_environment_category
+    - mart_market_environment_indicator_name
+    - mart_market_environment_signal_color
+    - mart_market_environment_regime_label
+    - mart_market_environment_as_of_period
+    - mart_market_environment_overall_environment
+tableName: mart_market_environment
 version: 1

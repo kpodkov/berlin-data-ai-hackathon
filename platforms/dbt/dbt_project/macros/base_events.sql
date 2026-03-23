@@ -70,8 +70,8 @@ renamed as (
         -- extracted: search context
         cc_search:searchEntry::text         as search_entry
 
+    -- bot traffic (Robot, Spy, Hacker) is pre-filtered at source; no WHERE clause needed here
     from deduplicated
-    where cc_yauaa:deviceClass::text not in ('Robot', 'Spy', 'Hacker')
 )
 
 select * from renamed

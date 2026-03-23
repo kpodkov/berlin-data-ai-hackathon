@@ -13,7 +13,7 @@ with pivoted as (
         max(case when indicator_code = 'BX.TRF.PWKR.CD.DT' then value end) as remittances_usd,
         max(case when indicator_code = 'SP.DYN.LE00.IN' then value end) as life_expectancy,
         max(case when indicator_code = 'PA.NUS.PPP' then value end) as ppp_factor
-    from {{ ref('stg_worldbank_countries') }}
+    from {{ ref('int_worldbank_enriched') }}
     group by 1, 2, 3
 )
 

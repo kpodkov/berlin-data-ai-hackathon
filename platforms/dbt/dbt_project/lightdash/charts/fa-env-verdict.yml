@@ -1,0 +1,29 @@
+chartConfig:
+  config:
+    label: "Market Verdict"
+    selectedField: mart_market_environment_overall_environment
+    showBigNumberLabel: true
+  type: big_number
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_market_environment_overall_environment
+  exploreName: mart_market_environment
+  filters: {}
+  limit: 1
+  metricOverrides: {}
+  metrics: []
+  sorts: []
+  tableCalculations: []
+name: "Market Environment Verdict"
+slug: fa-env-verdict
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_market_environment_overall_environment
+tableName: mart_market_environment
+version: 1

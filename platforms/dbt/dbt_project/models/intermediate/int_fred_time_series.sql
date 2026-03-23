@@ -10,7 +10,7 @@ with observations as (
         series_id,
         obs_date,
         value
-    from {{ ref('base_fred_observations') }}
+    from {{ ref('stg_fred_observations') }}
     where series_id in (
         'GDPC1',    -- Real GDP (quarterly)
         'CPIAUCSL', -- CPI All Urban Consumers (monthly)
@@ -46,9 +46,8 @@ metadata as (
         title,
         units,
         frequency,
-        seasonal_adjustment,
         category
-    from {{ ref('base_fred_series_metadata') }}
+    from {{ ref('stg_fred_series_metadata') }}
     where series_id in (
         'GDPC1', 'CPIAUCSL', 'UNRATE', 'FEDFUNDS',
         'DGS10', 'PSAVERT', 'TDSP', 'VIXCLS', 'SP500'
@@ -63,7 +62,6 @@ enriched as (
         md.title,
         md.units,
         md.frequency,
-        md.seasonal_adjustment,
         md.category,
 
         -- time dimension
@@ -98,7 +96,6 @@ select
     title,
     units,
     frequency,
-    seasonal_adjustment,
     category,
     month_date,
     value,

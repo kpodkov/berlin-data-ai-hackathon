@@ -1,0 +1,62 @@
+chartConfig:
+  config:
+    layout:
+      xField: mart_investment_performance_avg_rolling_12m_return
+      yField:
+        - mart_investment_performance_asset_class
+      flipAxes: true
+      showGridX: true
+      showGridY: false
+    eChartsConfig:
+      xAxis:
+        - name: "Trailing 12M Return (%)"
+      yAxis:
+        - name: ""
+      legend:
+        show: false
+      series:
+        - type: bar
+          color: "#3b82f6"
+          encode:
+            xRef:
+              field: mart_investment_performance_avg_rolling_12m_return
+            yRef:
+              field: mart_investment_performance_asset_class
+  type: cartesian
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_investment_performance_asset_class
+  exploreName: mart_investment_performance
+  filters:
+    dimensions:
+      id: "latest-month"
+      and:
+        - target:
+            fieldId: mart_investment_performance_month_key
+          operator: inThePast
+          values: [1]
+          settings:
+            unitOfTime: months
+            completed: true
+  limit: 20
+  metricOverrides: {}
+  metrics:
+    - mart_investment_performance_avg_rolling_12m_return
+  sorts:
+    - fieldId: mart_investment_performance_avg_rolling_12m_return
+      descending: true
+  tableCalculations: []
+name: "Trailing 12M Returns by Asset Class"
+slug: fa-investment-returns-bar
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_investment_performance_asset_class
+    - mart_investment_performance_avg_rolling_12m_return
+tableName: mart_investment_performance
+version: 1

@@ -1,0 +1,62 @@
+chartConfig:
+  config:
+    layout:
+      xField: mart_investment_performance_month_key_month
+      yField:
+        - mart_investment_performance_avg_cumulative_return
+      flipAxes: false
+      showGridX: false
+      showGridY: true
+    eChartsConfig:
+      xAxis:
+        - name: ""
+      yAxis:
+        - name: "Cumulative Return (%)"
+      legend:
+        show: true
+      series: []
+  type: cartesian
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_investment_performance_month_key_month
+    - mart_investment_performance_asset_class
+  exploreName: mart_investment_performance
+  filters:
+    dimensions:
+      id: "core-assets"
+      and:
+        - target:
+            fieldId: mart_investment_performance_asset_class
+          operator: equals
+          values:
+            - "US Equity"
+            - "US Bonds"
+            - "Gold"
+            - "Real Estate"
+            - "Crypto"
+  limit: 5000
+  metricOverrides: {}
+  metrics:
+    - mart_investment_performance_avg_cumulative_return
+  sorts:
+    - fieldId: mart_investment_performance_month_key_month
+      descending: false
+  tableCalculations: []
+pivotConfig:
+  columns:
+    - mart_investment_performance_asset_class
+name: "Cumulative Returns Over Time"
+slug: fa-investment-cumulative-line
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_investment_performance_month_key_month
+    - mart_investment_performance_asset_class
+    - mart_investment_performance_avg_cumulative_return
+tableName: mart_investment_performance
+version: 1

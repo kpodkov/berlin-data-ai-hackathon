@@ -1,15 +1,553 @@
 version: 2
 
 models:
+  - name: mart_investment_performance
+    description: "Asset class returns, drawdowns, and rolling performance. One row per (series_id, month_key)."
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          avg_monthly_return:
+            type: average
+            sql: "${TABLE}.monthly_return_pct"
+            label: "Avg Monthly Return (%)"
+            description: "Average monthly return across all asset classes"
+          avg_rolling_12m_return:
+            type: average
+            sql: "${TABLE}.rolling_12m_return_pct"
+            label: "Avg Trailing 12M Return (%)"
+            description: "Average trailing 12-month return"
+          max_drawdown:
+            type: min
+            sql: "${TABLE}.drawdown_pct"
+            label: "Max Drawdown (%)"
+            description: "Worst drawdown from all-time high"
+          avg_cumulative_return:
+            type: average
+            sql: "${TABLE}.cumulative_return_pct"
+            label: "Avg Cumulative Return (%)"
+            description: "Average cumulative return since inception"
+          avg_real_return:
+            type: average
+            sql: "${TABLE}.real_monthly_return_pct"
+            label: "Avg Real Monthly Return (%)"
+            description: "Average inflation-adjusted monthly return"
+    columns:
+      - name: series_id
+        description: "Ticker symbol (SPY, QQQ, AGG, etc.)"
+        meta:
+          dimension:
+            type: string
+            label: "Ticker"
+      - name: title
+        description: "Instrument name"
+        meta:
+          dimension:
+            type: string
+            label: "Instrument"
+      - name: asset_class
+        description: "Asset class bucket"
+        meta:
+          dimension:
+            type: string
+            label: "Asset Class"
+      - name: month_key
+        description: "First day of the calendar month"
+        meta:
+          dimension:
+            type: date
+            label: "Month"
+            time_intervals: [MONTH, QUARTER, YEAR]
+      - name: monthly_close
+        description: "End-of-month adjusted closing price (USD)"
+        meta:
+          dimension:
+            type: number
+            label: "Monthly Close"
+            format: "usd"
+      - name: monthly_return_pct
+        description: "Month-over-month return (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Monthly Return %"
+            round: 2
+      - name: real_monthly_return_pct
+        description: "Inflation-adjusted monthly return (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Real Monthly Return %"
+            round: 2
+      - name: cumulative_return_pct
+        description: "Cumulative return since inception (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Cumulative Return %"
+            round: 2
+      - name: cumulative_real_return_pct
+        description: "Cumulative real return since inception (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Cumulative Real Return %"
+            round: 2
+      - name: drawdown_pct
+        description: "Decline from all-time high (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Drawdown %"
+            round: 2
+      - name: rolling_12m_return_pct
+        description: "Trailing 12-month return (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Trailing 12M Return %"
+            round: 2
+      - name: vix_monthly_avg
+        description: "Monthly average VIX level"
+        meta:
+          dimension:
+            type: number
+            label: "VIX (Monthly Avg)"
+            round: 1
+
   - name: mart_inflation_impact
     description: "Monthly CPI breakdown with YoY changes and purchasing power index. One row per month."
-  - name: mart_housing_affordability
-    description: "Housing metrics: home prices, mortgage payments, affordability ratios. One row per month."
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          latest_cpi_all_yoy:
+            type: max
+            sql: "${TABLE}.cpi_all_yoy"
+            label: "Latest Overall CPI YoY %"
+            description: "Latest year-over-year CPI change"
+          latest_cpi_food_yoy:
+            type: max
+            sql: "${TABLE}.cpi_food_yoy"
+            label: "Latest Food CPI YoY %"
+            description: "Latest year-over-year food inflation"
+          latest_cpi_energy_yoy:
+            type: max
+            sql: "${TABLE}.cpi_energy_yoy"
+            label: "Latest Energy CPI YoY %"
+            description: "Latest year-over-year energy inflation"
+          latest_cpi_rent_yoy:
+            type: max
+            sql: "${TABLE}.cpi_rent_yoy"
+            label: "Latest Rent CPI YoY %"
+            description: "Latest year-over-year rent inflation"
+          min_purchasing_power:
+            type: min
+            sql: "${TABLE}.purchasing_power_index"
+            label: "Purchasing Power Index"
+            description: "Current purchasing power vs. baseline (lower = more erosion)"
+    columns:
+      - name: obs_month
+        description: "First day of the calendar month"
+        meta:
+          dimension:
+            type: date
+            label: "Month"
+            time_intervals: [MONTH, QUARTER, YEAR]
+      - name: cpi_all_yoy
+        description: "Overall CPI year-over-year change (%)"
+        meta:
+          dimension:
+            type: number
+            label: "CPI All YoY %"
+            round: 2
+      - name: cpi_food_yoy
+        description: "Food CPI YoY (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Food Inflation %"
+            round: 2
+      - name: cpi_energy_yoy
+        description: "Energy CPI YoY (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Energy Inflation %"
+            round: 2
+      - name: cpi_medical_yoy
+        description: "Medical CPI YoY (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Medical Inflation %"
+            round: 2
+      - name: cpi_education_yoy
+        description: "Education CPI YoY (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Education Inflation %"
+            round: 2
+      - name: cpi_transportation_yoy
+        description: "Transportation CPI YoY (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Transport Inflation %"
+            round: 2
+      - name: cpi_rent_yoy
+        description: "Rent CPI YoY (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Rent Inflation %"
+            round: 2
+      - name: purchasing_power_index
+        description: "Purchasing power index relative to baseline"
+        meta:
+          dimension:
+            type: number
+            label: "Purchasing Power"
+            round: 2
+
+  - name: mart_debt_burden
+    description: "Consumer debt metrics: borrowing costs, credit conditions. One row per month."
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          latest_mortgage_rate:
+            type: max
+            sql: "${TABLE}.mortgage_rate"
+            label: "Mortgage Rate %"
+            description: "Latest 30-year fixed mortgage rate"
+          latest_credit_card_rate:
+            type: max
+            sql: "${TABLE}.credit_card_rate"
+            label: "Credit Card Rate %"
+            description: "Latest average credit card interest rate"
+          latest_debt_service_ratio:
+            type: max
+            sql: "${TABLE}.debt_service_ratio"
+            label: "Debt Service Ratio %"
+            description: "Household debt payments as % of disposable income"
+    columns:
+      - name: obs_month
+        description: "First day of the calendar month"
+        meta:
+          dimension:
+            type: date
+            label: "Month"
+            time_intervals: [MONTH, QUARTER, YEAR]
+      - name: mortgage_rate
+        description: "30-year fixed mortgage rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Mortgage Rate %"
+            round: 2
+      - name: credit_card_rate
+        description: "Average credit card interest rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Credit Card Rate %"
+            round: 2
+      - name: fed_funds_rate
+        description: "Federal Funds Rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Fed Funds Rate %"
+            round: 2
+      - name: credit_card_spread
+        description: "Credit card rate minus Fed Funds (%)"
+        meta:
+          dimension:
+            type: number
+            label: "CC Spread %"
+            round: 2
+      - name: debt_service_ratio
+        description: "Debt service payments as % of disposable income"
+        meta:
+          dimension:
+            type: number
+            label: "Debt Service %"
+            round: 2
+      - name: total_credit
+        description: "Total consumer credit outstanding (billions)"
+        meta:
+          dimension:
+            type: number
+            label: "Total Credit ($B)"
+      - name: revolving_credit
+        description: "Revolving credit outstanding (billions)"
+        meta:
+          dimension:
+            type: number
+            label: "Revolving Credit ($B)"
+      - name: total_credit_yoy
+        description: "Total consumer credit YoY growth (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Credit Growth YoY %"
+            round: 2
+
   - name: mart_savings_health
     description: "Savings rate, real interest rates (after inflation). One row per month."
-  - name: mart_debt_burden
-    description: "Consumer debt metrics: credit card rates, mortgage rates, debt service ratio. One row per month."
-  - name: mart_investment_performance
-    description: "Asset class returns, drawdowns, rolling performance. One row per ticker per month."
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          latest_savings_rate:
+            type: max
+            sql: "${TABLE}.savings_rate"
+            label: "Savings Rate %"
+            description: "Personal savings as % of disposable income"
+          latest_real_fed_funds:
+            type: max
+            sql: "${TABLE}.real_fed_funds"
+            label: "Real Fed Funds Rate %"
+            description: "Fed Funds rate minus YoY CPI inflation"
+          latest_real_treasury:
+            type: max
+            sql: "${TABLE}.real_treasury_10y"
+            label: "Real 10Y Treasury %"
+            description: "10-year Treasury yield minus YoY CPI inflation"
+    columns:
+      - name: obs_month
+        description: "First day of the calendar month"
+        meta:
+          dimension:
+            type: date
+            label: "Month"
+            time_intervals: [MONTH, QUARTER, YEAR]
+      - name: savings_rate
+        description: "Personal savings rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Savings Rate %"
+            round: 2
+      - name: fed_funds_rate
+        description: "Federal Funds Rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Fed Funds Rate %"
+            round: 2
+      - name: treasury_10y
+        description: "10-Year Treasury Yield (%)"
+        meta:
+          dimension:
+            type: number
+            label: "10Y Treasury %"
+            round: 2
+      - name: cpi_yoy
+        description: "CPI year-over-year inflation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "CPI YoY %"
+            round: 2
+      - name: real_fed_funds
+        description: "Real Fed Funds rate (nominal minus CPI YoY)"
+        meta:
+          dimension:
+            type: number
+            label: "Real Fed Funds %"
+            round: 2
+      - name: real_treasury_10y
+        description: "Real 10Y Treasury yield (nominal minus CPI YoY)"
+        meta:
+          dimension:
+            type: number
+            label: "Real 10Y Treasury %"
+            round: 2
+
+  - name: mart_housing_affordability
+    description: "Housing metrics: home prices, mortgage payments, affordability ratios. One row per month."
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          latest_home_price:
+            type: max
+            sql: "${TABLE}.median_home_price"
+            label: "Median Home Price"
+            description: "National median home sale price"
+            format: "usd"
+          latest_mortgage_payment:
+            type: max
+            sql: "${TABLE}.monthly_mortgage_payment"
+            label: "Monthly Mortgage Payment"
+            description: "Monthly payment on 80% LTV 30-year mortgage"
+            format: "usd"
+          latest_price_to_income:
+            type: max
+            sql: "${TABLE}.home_price_to_income_ratio"
+            label: "Home Price / Income Ratio"
+            description: "Median home price divided by median annual income"
+          latest_mortgage_pct_income:
+            type: max
+            sql: "${TABLE}.mortgage_pct_of_income"
+            label: "Mortgage % of Income"
+            description: "Monthly mortgage payment as % of monthly income"
+    columns:
+      - name: obs_month
+        description: "First day of the calendar month"
+        meta:
+          dimension:
+            type: date
+            label: "Month"
+            time_intervals: [MONTH, QUARTER, YEAR]
+      - name: median_home_price
+        description: "National median home sale price (USD)"
+        meta:
+          dimension:
+            type: number
+            label: "Median Home Price"
+            format: "usd"
+      - name: mortgage_rate
+        description: "30-year fixed mortgage rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Mortgage Rate %"
+            round: 2
+      - name: monthly_mortgage_payment
+        description: "Monthly mortgage payment on median home (80% LTV, 30yr)"
+        meta:
+          dimension:
+            type: number
+            label: "Monthly Payment"
+            format: "usd"
+      - name: home_price_to_income_ratio
+        description: "Home price / annual income ratio"
+        meta:
+          dimension:
+            type: number
+            label: "Price-to-Income"
+            round: 2
+      - name: mortgage_pct_of_income
+        description: "Monthly mortgage as % of monthly income"
+        meta:
+          dimension:
+            type: number
+            label: "Mortgage % Income"
+            round: 1
+      - name: rent_yoy
+        description: "Year-over-year rent inflation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Rent YoY %"
+            round: 2
+      - name: housing_starts
+        description: "New housing starts (thousands, annualized)"
+        meta:
+          dimension:
+            type: number
+            label: "Housing Starts (K)"
+
   - name: mart_global_comparison
-    description: "Country-level economic indicators for international comparison. One row per country per year."
+    description: "Country-level economic indicators for international comparison. One row per (country_code, obs_year)."
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          avg_gdp_per_capita:
+            type: average
+            sql: "${TABLE}.gdp_per_capita"
+            label: "Avg GDP per Capita"
+            format: "usd"
+          avg_inflation:
+            type: average
+            sql: "${TABLE}.inflation_rate"
+            label: "Avg Inflation Rate %"
+          avg_unemployment:
+            type: average
+            sql: "${TABLE}.unemployment_rate"
+            label: "Avg Unemployment Rate %"
+    columns:
+      - name: country_code
+        description: "ISO3 country code"
+        meta:
+          dimension:
+            type: string
+            label: "Country Code"
+      - name: country_name
+        description: "Country name"
+        meta:
+          dimension:
+            type: string
+            label: "Country"
+      - name: obs_year
+        description: "Reference year"
+        meta:
+          dimension:
+            type: number
+            label: "Year"
+      - name: gdp_per_capita
+        description: "GDP per capita, PPP-adjusted (USD)"
+        meta:
+          dimension:
+            type: number
+            label: "GDP per Capita"
+            format: "usd"
+      - name: inflation_rate
+        description: "Annual inflation rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Inflation %"
+            round: 1
+      - name: unemployment_rate
+        description: "Unemployment rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Unemployment %"
+            round: 1
+      - name: gini_index
+        description: "Gini coefficient (0-100, higher = more inequality)"
+        meta:
+          dimension:
+            type: number
+            label: "Gini Index"
+            round: 1
+      - name: life_expectancy
+        description: "Life expectancy at birth (years)"
+        meta:
+          dimension:
+            type: number
+            label: "Life Expectancy"
+            round: 1
+      - name: savings_rate
+        description: "Gross national savings as % of GDP"
+        meta:
+          dimension:
+            type: number
+            label: "Savings Rate %"
+            round: 1
+      - name: real_interest_rate
+        description: "Real interest rate after inflation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Real Interest Rate %"
+            round: 1

@@ -1,12 +1,12 @@
 {
   "version": 1,
   "charts": {
-    "fa-env-green-count": "2026-03-23T14:20:24.064Z",
+    "fa-env-green-count": "2026-03-23T16:37:29.757Z",
     "fa-env-yellow-count": "2026-03-23T14:20:24.064Z",
     "fa-env-red-count": "2026-03-23T14:20:24.064Z",
-    "fa-env-indicator-table": "2026-03-23T14:20:24.064Z",
-    "fa-risk-score": "2026-03-23T14:20:24.064Z",
-    "fa-risk-table": "2026-03-23T14:20:24.064Z"
+    "fa-env-indicator-table": "2026-03-23T16:37:29.757Z",
+    "fa-risk-score": "2026-03-23T16:37:29.757Z",
+    "fa-risk-table": "2026-03-23T16:37:29.757Z"
   },
   "dashboards": {
     "financial-advisor-dashboard": "2026-03-23T14:20:24.394Z"

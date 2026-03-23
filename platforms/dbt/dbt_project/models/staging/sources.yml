@@ -8,12 +8,222 @@ sources:
       - name: FRED_OBSERVATIONS
         description: "FRED time series observations (31 series, 48.5K rows)"
       - name: FRED_SERIES_METADATA
+        identifier: FRED_METADATA
         description: "FRED series metadata (title, units, frequency)"
       - name: MARKET_PRICES
+        identifier: YAHOO_OBSERVATIONS
         description: "Yahoo Finance daily closing prices (13 tickers, 71.6K rows)"
       - name: MARKET_METADATA
+        identifier: YAHOO_METADATA
         description: "Yahoo Finance ticker metadata"
       - name: WORLDBANK_INDICATORS
+        identifier: WORLDBANK_OBSERVATIONS
         description: "World Bank development indicators (15 countries, 10 indicators)"
       - name: WORLDBANK_METADATA
         description: "World Bank indicator metadata"
+      - name: ECB_METADATA
+        description: "European Central Bank series catalogue. 30 EUR/FX exchange rate series."
+      - name: ECB_OBSERVATIONS
+        description: "ECB monthly exchange rate observations. ~8,871 rows. One row per (series_id, obs_date)."
+
+  - name: analysis
+    database: DB_TEAM_3
+    schema: ANALYSIS
+    tables:
+      - name: USER_FINANCIAL_PROFILES
+        description: "Pre-computed user financial profiles from JustWatch behavioral data. 1.58M users. Columns: user_id, segment, financial_score, tvod_propensity, svod_tier, is_cinema_goer, is_free_only, engagement_tier, loyalty_tier, etc."
+      - name: USER_FINANCIAL_ADVICE
+        description: "AI-generated per-user financial advice. 50,527 rows. Key columns: user_id, segment, financial_score, financial_advice (TEXT)."
+      - name: SEGMENT_INTELLIGENCE
+        description: "Aggregated stats per user segment (10 rows). Columns: segment, users, pct_of_total, avg_financial_score, top_genre, ai_insight."
+
+  - name: jw_shared
+    description: >
+      JustWatch anonymized behavioral and content data for the Berlin Data & AI Hackathon.
+      All tables live in the read-only DB_JW_SHARED.CHALLENGE schema shared across all teams.
+    database: DB_JW_SHARED
+    schema: CHALLENGE
+    tables:
+
+      - name: T1
+        description: >
+          Snowplow event stream — Germany only, December 2025. ~9.2M rows, 1.3 GB.
+          Fastest table for prototyping; validate all query logic here before scaling to T2–T4.
+        columns: &event_columns
+          - name: rid
+            description: Internal row identifier. Use for deduplication — guarantees uniqueness unlike event_id.
+          - name: event_id
+            description: Event UUID. May have rare duplicates due to at-least-once delivery in the Snowplow pipeline. Prefer `rid` for deduplication.
+          - name: collector_tstamp
+            description: "UTC timestamp when the Snowplow collector received the event. Primary timestamp for time-based analysis."
+          - name: derived_tstamp
+            description: Corrected timestamp accounting for client clock drift. More accurate for ordering events within a session.
+          - name: event
+            description: "Snowplow event type: 'struct' or 'page_view'."
+          - name: user_id
+            description: Anonymous device/browser ID assigned by JustWatch. Persistent across sessions on the same device. Not linked to any personal account.
+          - name: login_id
+            description: JustWatch login ID. Present when the user is logged in (~14% of events), NULL otherwise. Useful for identifying cross-device behaviour.
+          - name: session_id
+            description: JustWatch session ID. One session = continuous activity with <30 min inactivity gap.
+          - name: session_idx
+            description: Session sequence number for this user_id. 1 = first ever session on this device.
+          - name: app_id
+            description: "Application identifier: 'jw-web', 'jw-android', 'jw-ios'."
+          - name: platform
+            description: "Platform code: 'web' (~90%), 'mob' (~10%)."
+          - name: se_category
+            description: "Structured event category (e.g. 'clickout', 'userinteraction', 'watchlist_add'). NULL for page_view events. See data/events_library.md."
+          - name: se_action
+            description: Action within the category. Meaning depends on se_category. See data/events_library.md.
+          - name: se_label
+            description: Additional label. Meaning varies by se_category. See data/events_library.md.
+          - name: se_property
+            description: Additional property. Meaning varies by se_category. See data/events_library.md.
+          - name: se_value
+            description: Numeric value associated with the event. Meaning varies by se_category.
+          - name: geo_country
+            description: "ISO 3166-1 alpha-2 country from IP geolocation (e.g. 'DE'). This is the user's physical location — NOT their selected market. For the chosen market use cc_page_type:appLocale."
+          - name: geo_region_name
+            description: Region/state from IP geolocation (e.g. 'Bavaria'). May be null.
+          - name: geo_city
+            description: City from IP geolocation. May be null.
+          - name: useragent
+            description: Raw HTTP user agent string. Use cc_yauaa for parsed device/browser attributes instead.
+          - name: cc_title
+            description: >
+              VARIANT. Title context attached to content-related events.
+              Key fields: cc_title:jwEntityId::TEXT (join to objects.object_id),
+              cc_title:objectType::TEXT (movie/show/season/episode),
+              cc_title:seasonNumber::INT, cc_title:episodeNumber::INT.
+              NULL when the event is not content-related.
+          - name: cc_page_type
+            description: >
+              OBJECT. Page type context present on all events.
+              Key fields: cc_page_type:pageType::TEXT (e.g. 'title_detail', 'home'),
+              cc_page_type:appLocale::TEXT (user's chosen market, e.g. 'DE' — distinct from geo_country).
+          - name: cc_clickout
+            description: >
+              OBJECT. Clickout context — present only on se_category = 'clickout' events.
+              Key fields: cc_clickout:providerId::NUMBER (join to packages.id),
+              cc_clickout:monetizationType::TEXT (flatrate/free/rent/buy/ads/sports/cinema).
+          - name: cc_yauaa
+            description: >
+              OBJECT. Parsed user agent via YAUAA library.
+              Key fields: cc_yauaa:deviceClass::TEXT ('Desktop', 'Phone', 'Tablet'),
+              cc_yauaa:agentName::TEXT (browser name).
+              Bots (Robot/Spy/Hacker) were pre-filtered from the hackathon data and are not present.
+          - name: cc_search
+            description: >
+              OBJECT. Search context — present on search-related events.
+              Key field: cc_search:searchEntry::TEXT (the query string typed by the user).
+
+      - name: T2
+        description: >
+          Snowplow event stream — 8 EU markets, December 2025. ~40M rows, 5.7 GB.
+          Use after validating query logic on T1. Same schema as T1.
+        columns: *event_columns
+
+      - name: T3
+        description: >
+          Snowplow event stream — 8 EU markets, November 2025 – January 2026 (3 months). ~128M rows, 17.9 GB.
+          Use for time-series and trend analysis. Requires WH_TEAM_<N>_S or larger.
+        columns: *event_columns
+
+      - name: T4
+        description: >
+          Snowplow event stream — 15 global markets, November–December 2025. ~254M rows, 36.1 GB.
+          Full dataset for global analysis. Requires WH_TEAM_<N>_M for complex queries.
+        columns: *event_columns
+
+      - name: OBJECTS
+        description: >
+          JustWatch content metadata. ~13M rows. One row per content object (movie, show, season, episode).
+          Join to events via: cc_title:jwEntityId::TEXT = objects.object_id.
+        columns:
+          - name: object_id
+            description: "JustWatch content ID. Primary key. Prefix indicates type: 'tm' = movie, 'ts' = show, 'tss' = season, 'tse' = episode. Join with cc_title:jwEntityId::TEXT."
+          - name: object_type
+            description: "Content type: 'movie', 'show', 'show_season', 'show_episode'."
+          - name: title_id
+            description: Top-level title ID. Same as object_id for movies/shows. Points to parent show for seasons/episodes.
+          - name: parent_id
+            description: For episodes — object_id of their season. For seasons — object_id of the show. NULL for movies/shows.
+          - name: show_season_id
+            description: For episodes only — object_id of the season. NULL otherwise.
+          - name: title
+            description: Display title in English.
+          - name: original_title
+            description: Title in the original production language (e.g. 'Das Boot').
+          - name: translated_title
+            description: Translated display title where available.
+          - name: short_description
+            description: Short synopsis in English.
+          - name: object_text_short_description
+            description: Localized short description (best available language).
+          - name: object_text_translated_title
+            description: Localized title (best available language).
+          - name: release_year
+            description: Year of release. For shows — year of first episode.
+          - name: release_date
+            description: Full release date. May be null.
+          - name: runtime
+            description: Runtime in minutes. For movies — total runtime. For shows — average episode runtime.
+          - name: original_language
+            description: "ISO 639-1 language code of original production (e.g. 'en', 'de', 'ko')."
+          - name: genre_tmdb
+            description: "ARRAY. Genres from TMDB (e.g. ['Drama', 'Thriller']). Use LATERAL FLATTEN(input => genre_tmdb) to expand."
+          - name: production_countries
+            description: "ARRAY. ISO 3166-1 country codes of production countries. Use LATERAL FLATTEN to expand."
+          - name: production_budget
+            description: Production budget in USD. Null for many titles.
+          - name: seasons
+            description: Total number of seasons. Shows only.
+          - name: season_number
+            description: Season number within the show. Seasons and episodes only.
+          - name: episodes
+            description: Total episodes in show or season.
+          - name: episode_number
+            description: Episode number within its season. Episodes only.
+          - name: episodes_per_season
+            description: Number of episodes in this season. Seasons only.
+          - name: imdb_score
+            description: IMDB user rating (0.0–10.0). May be null.
+          - name: scoring
+            description: "OBJECT. JustWatch scoring data. Key: scoring:score_imdb_votes::NUMBER."
+          - name: id_imdb
+            description: "IMDB ID (e.g. 'tt0120737')."
+          - name: id_tmdb
+            description: TMDB identifier.
+          - name: url_imdb
+            description: Full IMDB URL.
+          - name: url_tmdb
+            description: Full TMDB URL.
+          - name: talent_cast
+            description: "ARRAY. Cast member names. Use LATERAL FLATTEN to expand."
+          - name: talent_director
+            description: "ARRAY. Director names. Use LATERAL FLATTEN to expand."
+          - name: talent_writer
+            description: "ARRAY. Writer names. Use LATERAL FLATTEN to expand."
+          - name: studios
+            description: "OBJECT. Production studio info. Key: studios:name::TEXT."
+          - name: poster_jw
+            description: JustWatch poster image URL.
+          - name: trailers
+            description: ARRAY of trailer objects with YouTube URLs. May be null.
+
+      - name: PACKAGES
+        description: >
+          Streaming provider / package lookup. 1,526 rows. One row per provider.
+          Join to events via: cc_clickout:providerId::NUMBER = packages.id.
+        columns:
+          - name: id
+            description: Provider identifier. Primary key. Join with cc_clickout:providerId::NUMBER.
+          - name: technical_name
+            description: "Internal technical slug (e.g. 'netflix', 'amazon_prime_video', 'disney_plus'). Stable identifier — use for grouping/filtering in code."
+          - name: clear_name
+            description: "Display name (e.g. 'Netflix', 'Amazon Prime Video', 'Disney+'). Use for labels and chart axes."
+          - name: full_name
+            description: Full official provider name.
+          - name: monetization_types
+            description: "Comma-separated monetization models offered: 'flatrate' (subscription), 'free' (ad-supported), 'rent', 'buy', 'cinema'. A provider may offer multiple (e.g. 'flatrate,rent,buy')."

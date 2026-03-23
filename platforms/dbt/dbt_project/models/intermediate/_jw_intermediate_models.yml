@@ -1,0 +1,203 @@
+version: 2
+
+models:
+  - name: int_title_demand_signals
+    description: >
+      Daily demand signal aggregates per top-level content title.
+      Grain: one row per (title_entity_id, event_date).
+      Aggregates page views, watchlist/seenlist/like actions, trailer plays, and clickout intents
+      (AVOD, TVOD, SVOD) from stg_events_t1 into counts per day.
+      Source is T1 (Germany/December); change the ref to scale to T2–T4.
+      Used by mart_title_licensing_score (rolled up to title total)
+      and mart_title_seasonality (rolled up to weekly).
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: title_entity_id
+        description: JustWatch content ID. Composite primary key with event_date. Join to stg_objects.object_id.
+        data_tests:
+          - not_null
+      - name: event_date
+        description: Calendar date of the events. Composite primary key with title_entity_id. Truncated from collector_tstamp.
+        data_tests:
+          - not_null
+      - name: page_views
+        description: Count of page_view events for this title on this date.
+      - name: title_clicks
+        description: Count of userinteraction / title_clicked events.
+      - name: watchlist_adds
+        description: Count of watchlist_add events. Strong engagement signal.
+      - name: seenlist_adds
+        description: Count of seenlist_add events.
+      - name: likes
+        description: Count of likelist_add events.
+      - name: trailer_plays
+        description: Count of youtube_started events (trailer plays).
+      - name: avod_clickouts
+        description: Count of clickout events with se_action in ('free', 'ads'). Direct AVOD purchase intent.
+      - name: rent_clickouts
+        description: Count of clickout events with se_action = 'rent'.
+      - name: buy_clickouts
+        description: Count of clickout events with se_action = 'buy'.
+      - name: cinema_clickouts
+        description: Count of clickout events with se_action = 'cinema'.
+      - name: tvod_clickouts
+        description: Count of clickout events with se_action in ('rent', 'buy', 'cinema'). Strongest transactional intent signal.
+      - name: svod_clickouts
+        description: Count of clickout events with se_action in ('flatrate', 'sports'). Competitor/subscription signal.
+      - name: total_clickouts
+        description: Count of all clickout events for this title on this date.
+      - name: unique_users
+        description: Count of distinct user_ids engaged with this title on this date.
+      - name: unique_sessions
+        description: Count of distinct session_ids for this title on this date.
+      - name: market_count
+        description: Count of distinct app_locale values seen for this title on this date. Proxy for cross-market reach.
+
+  - name: int_title_market_demand
+    description: >
+      Demand signals broken down by the user's chosen market (app_locale) per title.
+      Grain: one row per (title_entity_id, app_locale).
+      Uses app_locale (user's selected market) — not geo_country (physical location) —
+      which is the correct dimension for cross-market licensing ROI analysis.
+      Includes weighted AVOD and TVOD demand scores using the same formula as mart_title_licensing_score.
+      Used by mart_market_demand_gap (market entry scorecard).
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: title_entity_id
+        description: JustWatch content ID. Composite primary key with app_locale.
+        data_tests:
+          - not_null
+      - name: app_locale
+        description: "User's chosen market (e.g. 'DE', 'FR'). Composite primary key with title_entity_id. Distinct from geo_country."
+        data_tests:
+          - not_null
+      - name: page_views
+        description: Count of page_view events for this title in this market.
+      - name: watchlist_adds
+        description: Count of watchlist_add events for this title in this market.
+      - name: avod_clickouts
+        description: Count of clickout events with se_action in ('free', 'ads') for this title in this market.
+      - name: tvod_clickouts
+        description: Count of clickout events with se_action in ('rent', 'buy', 'cinema') for this title in this market.
+      - name: total_clickouts
+        description: Count of all clickout events for this title in this market.
+      - name: unique_users
+        description: Count of distinct user_ids who engaged with this title in this market.
+      - name: avod_demand
+        description: >
+          Weighted AVOD demand score: (page_views × 1) + (watchlist_adds × 5) + (avod_clickouts × 10).
+          Consistent with mart_title_licensing_score weights.
+      - name: tvod_demand
+        description: >
+          Weighted TVOD demand score: tvod_clickouts × 10.
+          Consistent with mart_title_licensing_score weights.
+
+  - name: int_title_provider_supply
+    description: >
+      Demand-inferred provider supply per title, provider, and monetization type.
+      Grain: one row per (title_entity_id, provider_id, monetization_type).
+      Infers what providers a title is available on using clickout events as a supply signal —
+      a clickout to a provider is strong evidence the offer exists.
+      This is a demand-based proxy, not a catalogue feed: a title with zero clickouts to a
+      provider may still be available there but had no observed demand.
+      Used by mart_title_licensing_score (to detect supply gaps) and
+      mart_market_demand_gap (to measure coverage per market).
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: title_entity_id
+        description: JustWatch content ID. Composite primary key with provider_id and monetization_type.
+        data_tests:
+          - not_null
+      - name: provider_id
+        description: Provider ID from clickout events. Composite primary key with title_entity_id and monetization_type. Join to stg_packages.provider_id.
+        data_tests:
+          - not_null
+      - name: monetization_type
+        description: "Monetization type observed in clickout events (e.g. 'flatrate', 'free', 'rent', 'buy', 'ads', 'cinema'). Composite primary key with title_entity_id and provider_id."
+        data_tests:
+          - not_null
+      - name: unique_users_clicking
+        description: Count of distinct user_ids who clicked out to this provider for this title under this monetization type.
+      - name: clickout_count
+        description: Total number of clickout events to this provider for this title under this monetization type.
+      - name: provider_technical_name
+        description: Provider technical slug from stg_packages (e.g. 'netflix'). May be null if provider not in packages.
+      - name: provider_clear_name
+        description: Provider display name from stg_packages (e.g. 'Netflix'). May be null if provider not in packages.
+      - name: monetization_bucket
+        description: >
+          Grouped monetization category:
+          'avod' (free/ads), 'tvod' (rent/buy/cinema), 'svod' (flatrate/sports), 'other'.
+
+  - name: int_user_activity
+    description: >
+      Per-user behavioral feature matrix aggregated from stg_events_t1.
+      Grain: one row per user_id.
+      Covers all December 2025 activity for Germany, split into early (Dec 1–14) vs
+      recent (Dec 15–31) periods to enable churn risk detection via engagement drop-off.
+      Includes AVOD, TVOD, and SVOD intent signal counts, session and title breadth metrics,
+      and the user's primary app_locale (most-used market).
+      Used by mart_user_segments.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: intermediate
+    columns:
+      - name: user_id
+        description: Anonymous device/browser ID. Primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: login_id
+        description: JustWatch login ID if the user was ever logged in during the period. NULL if always anonymous.
+      - name: first_seen_date
+        description: Earliest event date for this user in the dataset.
+      - name: last_seen_date
+        description: Most recent event date for this user in the dataset.
+      - name: active_days
+        description: Count of distinct calendar dates on which this user was active.
+      - name: total_sessions
+        description: Count of distinct session_ids for this user.
+      - name: total_events
+        description: Total count of all events for this user.
+      - name: content_events
+        description: Count of events where title_entity_id is not null (content-related events).
+      - name: unique_titles_engaged
+        description: Count of distinct content titles this user interacted with.
+      - name: title_page_views
+        description: Count of page_view events on content title pages.
+      - name: watchlist_adds
+        description: Count of watchlist_add events.
+      - name: seenlist_adds
+        description: Count of seenlist_add events.
+      - name: likes
+        description: Count of likelist_add events.
+      - name: avod_clickouts
+        description: Count of clickout events with se_action in ('free', 'ads').
+      - name: rent_clickouts
+        description: Count of clickout events with se_action = 'rent'.
+      - name: buy_clickouts
+        description: Count of clickout events with se_action = 'buy'.
+      - name: cinema_clickouts
+        description: Count of clickout events with se_action = 'cinema'.
+      - name: svod_clickouts
+        description: Count of clickout events with se_action in ('flatrate', 'sports').
+      - name: early_period_events
+        description: Count of events from December 1–14. Used with recent_period_events to detect churn risk.
+      - name: recent_period_events
+        description: Count of events from December 15–31. Compared against early_period_events to flag drop-off.
+      - name: primary_market
+        description: The app_locale value most frequently used by this user. Derived via mode aggregation.

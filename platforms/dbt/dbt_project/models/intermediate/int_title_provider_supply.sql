@@ -6,8 +6,8 @@
 -- A title with zero clickouts to a provider may still be available there — it just had no
 -- observed demand. Use alongside demand signals, not as ground truth.
 --
--- Used by: fct_title_licensing_score (to detect supply gaps)
---          fct_market_demand_gap (to measure coverage per market)
+-- Used by: mart_title_licensing_score (to detect supply gaps)
+--          mart_market_demand_gap (to measure coverage per market)
 {{ config(materialized='table') }}
 
 with clickouts as (
@@ -17,7 +17,7 @@ with clickouts as (
         clickout_monetization_type              as monetization_type,
         count(distinct user_id)                 as unique_users_clicking,
         count(*)                                as clickout_count
-    from {{ ref('base_events_t1') }}
+    from {{ ref('stg_events_t1') }}
     where se_category = 'clickout'
       and title_entity_id is not null
       and clickout_provider_id is not null
@@ -42,5 +42,5 @@ select
     end                         as monetization_bucket
 
 from clickouts c
-left join {{ ref('base_packages') }} p
+left join {{ ref('stg_packages') }} p
     on c.provider_id = p.provider_id

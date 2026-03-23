@@ -1,0 +1,71 @@
+chartConfig:
+  config:
+    showColumnCalculation: false
+    showTableNames: false
+    hideRowNumbers: true
+    columns:
+      mart_investment_performance_asset_class:
+        name: "Asset Class"
+        frozen: true
+      mart_investment_performance_title:
+        name: "Instrument"
+      mart_investment_performance_rolling_12m_return_pct:
+        name: "12M Return %"
+      mart_investment_performance_drawdown_pct:
+        name: "Drawdown %"
+      mart_investment_performance_cumulative_return_pct:
+        name: "Cumulative %"
+    conditionalFormattings:
+      - applyTo: cell
+        target:
+          fieldId: mart_investment_performance_rolling_12m_return_pct
+        color:
+          start: "#EF4444"
+          end: "#10B981"
+        rule:
+          min: "auto"
+          max: "auto"
+  type: table
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_investment_performance_asset_class
+    - mart_investment_performance_title
+    - mart_investment_performance_rolling_12m_return_pct
+    - mart_investment_performance_drawdown_pct
+    - mart_investment_performance_cumulative_return_pct
+  exploreName: mart_investment_performance
+  filters:
+    dimensions:
+      id: "latest-month"
+      and:
+        - target:
+            fieldId: mart_investment_performance_month_key
+          operator: inThePast
+          values: [1]
+          settings:
+            unitOfTime: months
+            completed: true
+  limit: 20
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - fieldId: mart_investment_performance_asset_class
+      descending: false
+  tableCalculations: []
+name: "Asset Performance Snapshot"
+slug: fa-investment-table
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_investment_performance_asset_class
+    - mart_investment_performance_title
+    - mart_investment_performance_rolling_12m_return_pct
+    - mart_investment_performance_drawdown_pct
+    - mart_investment_performance_cumulative_return_pct
+tableName: mart_investment_performance
+version: 1

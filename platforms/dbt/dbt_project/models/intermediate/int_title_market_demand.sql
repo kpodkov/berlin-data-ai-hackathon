@@ -6,12 +6,12 @@
 -- geo_country is where the request came from (e.g. 'FR' for a German expat in France).
 -- Always use app_locale for market demand analysis.
 --
--- Used by: fct_market_demand_gap (market entry scorecard)
+-- Used by: mart_market_demand_gap (market entry scorecard)
 {{ config(materialized='table') }}
 
 with events as (
     select *
-    from {{ ref('base_events_t1') }}
+    from {{ ref('stg_events_t1') }}
     where title_entity_id is not null
       and app_locale is not null      -- exclude events with no market signal
 )
@@ -28,7 +28,7 @@ select
     count_if(se_category = 'clickout')                                                  as total_clickouts,
     count(distinct user_id)                                                             as unique_users,
 
-    -- weighted demand scores (same formula as fct_title_licensing_score for consistency)
+    -- weighted demand scores (same formula as mart_title_licensing_score for consistency)
     (
         count_if(event = 'page_view')                                        * 1
         + count_if(se_category = 'watchlist_add')                            * 5

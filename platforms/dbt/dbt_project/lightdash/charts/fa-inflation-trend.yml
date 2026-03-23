@@ -1,0 +1,100 @@
+chartConfig:
+  config:
+    layout:
+      xField: mart_inflation_impact_obs_month_month
+      yField:
+        - mart_inflation_impact_cpi_all_yoy
+        - mart_inflation_impact_cpi_food_yoy
+        - mart_inflation_impact_cpi_energy_yoy
+        - mart_inflation_impact_cpi_rent_yoy
+      flipAxes: false
+      showGridX: false
+      showGridY: true
+    eChartsConfig:
+      xAxis:
+        - name: ""
+      yAxis:
+        - name: "YoY Change (%)"
+      legend:
+        show: true
+      series:
+        - type: line
+          name: "Overall CPI"
+          color: "#3b82f6"
+          smooth: true
+          encode:
+            xRef:
+              field: mart_inflation_impact_obs_month_month
+            yRef:
+              field: mart_inflation_impact_cpi_all_yoy
+        - type: line
+          name: "Food"
+          color: "#f59e0b"
+          smooth: true
+          encode:
+            xRef:
+              field: mart_inflation_impact_obs_month_month
+            yRef:
+              field: mart_inflation_impact_cpi_food_yoy
+        - type: line
+          name: "Energy"
+          color: "#ef4444"
+          smooth: true
+          encode:
+            xRef:
+              field: mart_inflation_impact_obs_month_month
+            yRef:
+              field: mart_inflation_impact_cpi_energy_yoy
+        - type: line
+          name: "Rent"
+          color: "#10b981"
+          smooth: true
+          encode:
+            xRef:
+              field: mart_inflation_impact_obs_month_month
+            yRef:
+              field: mart_inflation_impact_cpi_rent_yoy
+  type: cartesian
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_inflation_impact_obs_month_month
+    - mart_inflation_impact_cpi_all_yoy
+    - mart_inflation_impact_cpi_food_yoy
+    - mart_inflation_impact_cpi_energy_yoy
+    - mart_inflation_impact_cpi_rent_yoy
+  exploreName: mart_inflation_impact
+  filters:
+    dimensions:
+      id: "last-5-years"
+      and:
+        - target:
+            fieldId: mart_inflation_impact_obs_month
+          operator: inThePast
+          values: [5]
+          settings:
+            unitOfTime: years
+            completed: false
+  limit: 500
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - fieldId: mart_inflation_impact_obs_month_month
+      descending: false
+  tableCalculations: []
+name: "Inflation by Category (5Y)"
+slug: fa-inflation-trend
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_inflation_impact_obs_month_month
+    - mart_inflation_impact_cpi_all_yoy
+    - mart_inflation_impact_cpi_food_yoy
+    - mart_inflation_impact_cpi_energy_yoy
+    - mart_inflation_impact_cpi_rent_yoy
+tableName: mart_inflation_impact
+version: 1

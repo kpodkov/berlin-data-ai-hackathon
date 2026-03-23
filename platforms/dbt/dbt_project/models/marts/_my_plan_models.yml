@@ -1,0 +1,213 @@
+version: 2
+
+models:
+  - name: mart_my_financial_plan
+    description: >
+      Pre-computed personal financial planning scenarios.
+      Grain: one row per (age_group, risk_profile, savings_monthly, horizon_years).
+      Filter by your profile to see personalized wealth projections and guidance.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          sum_projected_wealth:
+            type: sum
+            sql: "${TABLE}.projected_wealth"
+            label: "Projected Wealth (Sum)"
+            format: "usd"
+            description: "Sum of projected wealth across scenarios"
+          sum_projected_wealth_real:
+            type: sum
+            sql: "${TABLE}.projected_wealth_real"
+            label: "Projected Wealth Real (Sum)"
+            format: "usd"
+            description: "Sum of inflation-adjusted projected wealth"
+          sum_total_contributed:
+            type: sum
+            sql: "${TABLE}.total_contributed"
+            label: "Total Contributed (Sum)"
+            format: "usd"
+            description: "Sum of total savings contributions"
+          avg_expected_return:
+            type: average
+            sql: "${TABLE}.expected_return_pct"
+            label: "Expected Return %"
+            description: "Portfolio expected annual return"
+          avg_expected_vol:
+            type: average
+            sql: "${TABLE}.expected_vol_pct"
+            label: "Expected Volatility %"
+            description: "Portfolio expected annual volatility"
+    columns:
+      - name: age_group
+        description: "Age bracket filter"
+        meta:
+          dimension:
+            type: string
+            label: "Age Group"
+      - name: life_stage
+        description: "What this age group should focus on"
+        meta:
+          dimension:
+            type: string
+            label: "Life Stage Guidance"
+      - name: retirement_years
+        description: "Approximate years to retirement"
+        meta:
+          dimension:
+            type: number
+            label: "Years to Retirement"
+      - name: risk_profile
+        description: "Investment risk tolerance"
+        meta:
+          dimension:
+            type: string
+            label: "Risk Profile"
+      - name: risk_description
+        description: "What this risk profile means"
+        meta:
+          dimension:
+            type: string
+            label: "Risk Description"
+      - name: equity_pct
+        description: "Stock allocation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Stocks %"
+            round: 0
+            format: "percent"
+      - name: bond_pct
+        description: "Bond allocation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Bonds %"
+            round: 0
+            format: "percent"
+      - name: gold_pct
+        description: "Gold allocation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Gold %"
+            round: 0
+            format: "percent"
+      - name: reit_pct
+        description: "Real estate allocation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Real Estate %"
+            round: 0
+            format: "percent"
+      - name: savings_monthly
+        description: "Monthly savings amount"
+        meta:
+          dimension:
+            type: number
+            label: "Monthly Savings ($)"
+            format: "usd"
+      - name: savings_label
+        description: "Monthly savings display label"
+        meta:
+          dimension:
+            type: string
+            label: "Savings Level"
+      - name: horizon_years
+        description: "Investment time horizon in years"
+        meta:
+          dimension:
+            type: number
+            label: "Time Horizon (Years)"
+      - name: expected_return_pct
+        description: "Expected annual portfolio return (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Expected Return %"
+            round: 1
+      - name: expected_vol_pct
+        description: "Expected annual portfolio volatility (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Expected Volatility %"
+            round: 1
+      - name: projected_wealth
+        description: "Projected portfolio value at end of horizon"
+        meta:
+          dimension:
+            type: number
+            label: "Projected Wealth"
+            format: "usd"
+            compact: "thousands"
+      - name: projected_wealth_real
+        description: "Projected portfolio value adjusted for inflation"
+        meta:
+          dimension:
+            type: number
+            label: "Projected Wealth (Real)"
+            format: "usd"
+            compact: "thousands"
+      - name: total_contributed
+        description: "Total amount saved (no returns)"
+        meta:
+          dimension:
+            type: number
+            label: "Total Contributed"
+            format: "usd"
+            compact: "thousands"
+      - name: market_verdict
+        description: "Current macro environment verdict"
+        meta:
+          dimension:
+            type: string
+            label: "Market Verdict"
+      - name: market_signal
+        description: "Current macro traffic light"
+        meta:
+          dimension:
+            type: string
+            label: "Market Signal"
+      - name: current_inflation_pct
+        description: "Current YoY CPI inflation (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Current Inflation %"
+            round: 1
+      - name: current_mortgage_rate
+        description: "Current 30-year mortgage rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Mortgage Rate %"
+            round: 2
+      - name: current_cc_rate
+        description: "Current average credit card rate (%)"
+        meta:
+          dimension:
+            type: number
+            label: "Credit Card Rate %"
+            round: 2
+      - name: personalized_action
+        description: "Personalized recommendation based on your profile and macro conditions"
+        meta:
+          dimension:
+            type: string
+            label: "Action for You"
+      - name: data_as_of
+        description: "Data freshness indicator (YYYY-MM)"
+        meta:
+          dimension:
+            type: string
+            label: "Data As Of"
+      - name: disclaimer
+        meta:
+          dimension:
+            type: string
+            label: "Disclaimer"
+            hidden: true

@@ -7,7 +7,7 @@ with monthly_raw as (
         max(case when series_id = 'CUSR0000SEHA' then value end) as rent_index,
         max(case when series_id = 'HOUST' then value end) as housing_starts,
         max(case when series_id = 'MEHOINUSA672N' then value end) as median_income_annual
-    from {{ ref('stg_fred_timeseries') }}
+    from {{ ref('int_fred_topic_classified') }}
     where topic in ('housing', 'income', 'debt')
     group by 1
 ),

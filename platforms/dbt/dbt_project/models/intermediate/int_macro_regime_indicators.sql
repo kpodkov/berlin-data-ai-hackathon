@@ -30,10 +30,9 @@ with raw_obs as (
         o.value,
         m.title,
         m.units,
-        m.frequency,
-        m.seasonal_adjustment
-    from {{ ref('base_fred_observations') }} as o
-    inner join {{ ref('base_fred_series_metadata') }} as m
+        m.frequency
+    from {{ ref('stg_fred_observations') }} as o
+    inner join {{ ref('stg_fred_series_metadata') }} as m
         on o.series_id = m.series_id
     where
         o.series_id in (
@@ -77,8 +76,7 @@ monthly_norm as (
         value                                                       as monthly_value,
         title,
         units,
-        frequency,
-        seasonal_adjustment
+        frequency
     from raw_obs
     qualify
         row_number() over (
@@ -105,7 +103,6 @@ with_stats as (
         title,
         units,
         frequency,
-        seasonal_adjustment,
 
         -- 12-month lag for year-over-year comparison
         lag(monthly_value, 12) over (
@@ -160,7 +157,6 @@ with_zscore as (
         title,
         units,
         frequency,
-        seasonal_adjustment,
 
         -- Z-score: only computed when we have at least 12 months of data
         case
@@ -258,8 +254,7 @@ latest as (
         as_of_period,
         title,
         units,
-        frequency,
-        seasonal_adjustment
+        frequency
     from with_zscore
     qualify
         row_number() over (

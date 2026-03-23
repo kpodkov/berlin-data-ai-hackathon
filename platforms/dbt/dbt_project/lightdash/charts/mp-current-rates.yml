@@ -1,0 +1,48 @@
+chartConfig:
+  config:
+    columns:
+      mart_my_financial_plan_current_cc_rate:
+        name: "Credit Card Rate %"
+      mart_my_financial_plan_current_inflation_pct:
+        name: "Current Inflation %"
+      mart_my_financial_plan_current_mortgage_rate:
+        name: "Mortgage Rate %"
+      mart_my_financial_plan_data_as_of:
+        name: "Data As Of"
+      mart_my_financial_plan_expected_return_pct:
+        name: "Your Expected Return %"
+    hideRowNumbers: true
+    showColumnCalculation: false
+    showTableNames: false
+  type: table
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_my_financial_plan_expected_return_pct
+    - mart_my_financial_plan_current_inflation_pct
+    - mart_my_financial_plan_current_mortgage_rate
+    - mart_my_financial_plan_current_cc_rate
+    - mart_my_financial_plan_data_as_of
+  exploreName: mart_my_financial_plan
+  filters: {}
+  limit: 1
+  metricOverrides: {}
+  metrics: []
+  sorts: []
+  tableCalculations: []
+name: "Current Rates & Your Return"
+slug: mp-current-rates
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_my_financial_plan_expected_return_pct
+    - mart_my_financial_plan_current_inflation_pct
+    - mart_my_financial_plan_current_mortgage_rate
+    - mart_my_financial_plan_current_cc_rate
+    - mart_my_financial_plan_data_as_of
+tableName: mart_my_financial_plan
+version: 1

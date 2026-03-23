@@ -1,0 +1,63 @@
+chartConfig:
+  config:
+    columns:
+      mart_my_financial_plan_equity_pct:
+        name: "Stocks"
+      mart_my_financial_plan_bond_pct:
+        name: "Bonds"
+      mart_my_financial_plan_expected_return_pct:
+        name: "Exp. Return %"
+      mart_my_financial_plan_expected_vol_pct:
+        name: "Exp. Volatility %"
+      mart_my_financial_plan_gold_pct:
+        name: "Gold"
+      mart_my_financial_plan_reit_pct:
+        name: "Real Estate"
+      mart_my_financial_plan_risk_description:
+        name: "Description"
+      mart_my_financial_plan_risk_profile:
+        frozen: true
+        name: "Risk Profile"
+    hideRowNumbers: true
+    showColumnCalculation: false
+    showTableNames: false
+  type: table
+contentType: chart
+description: null
+metricQuery:
+  additionalMetrics: []
+  customDimensions: []
+  dimensionOverrides: {}
+  dimensions:
+    - mart_my_financial_plan_risk_profile
+    - mart_my_financial_plan_risk_description
+    - mart_my_financial_plan_equity_pct
+    - mart_my_financial_plan_bond_pct
+    - mart_my_financial_plan_gold_pct
+    - mart_my_financial_plan_reit_pct
+    - mart_my_financial_plan_expected_return_pct
+    - mart_my_financial_plan_expected_vol_pct
+  exploreName: mart_my_financial_plan
+  filters: {}
+  limit: 3
+  metricOverrides: {}
+  metrics: []
+  sorts:
+    - descending: false
+      fieldId: mart_my_financial_plan_expected_vol_pct
+  tableCalculations: []
+name: "Portfolio Options"
+slug: mp-portfolio-table
+spaceSlug: shared
+tableConfig:
+  columnOrder:
+    - mart_my_financial_plan_risk_profile
+    - mart_my_financial_plan_risk_description
+    - mart_my_financial_plan_equity_pct
+    - mart_my_financial_plan_bond_pct
+    - mart_my_financial_plan_gold_pct
+    - mart_my_financial_plan_reit_pct
+    - mart_my_financial_plan_expected_return_pct
+    - mart_my_financial_plan_expected_vol_pct
+tableName: mart_my_financial_plan
+version: 1

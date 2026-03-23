@@ -1,0 +1,73 @@
+version: 2
+
+models:
+  - name: stg_market_metadata
+    description: >
+      Bronze layer for Yahoo Finance instrument catalogue.
+      One row per series_id (ticker). Faithful copy of DB_TEAM_3.RAW.MARKET_METADATA
+      with audit columns added (_source, _loaded_at).
+      13 daily-frequency instruments: US equity ETFs, bond ETFs, real estate, gold,
+      international equity, cryptocurrencies, and the US Dollar Index.
+      Join to stg_market_prices on series_id to enrich price data with instrument descriptions.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        source: Yahoo Finance (yfinance)
+        layer: staging
+    columns:
+      - name: series_id
+        description: >
+          Yahoo Finance ticker symbol. Primary key. Matches series_id in stg_market_prices.
+          Known values: SPY, QQQ, XLE, AGG, TLT, TIP, VNQ, GLD, VEA, VWO, BTC-USD, ETH-USD, DX-Y.NYB.
+        data_tests:
+          - not_null
+          - unique
+      - name: title
+        description: Human-readable instrument name (e.g. "S&P 500 ETF", "Bitcoin USD").
+      - name: units
+        description: Currency denomination. All instruments denominated in USD.
+      - name: frequency
+        description: Data frequency. All instruments are Daily.
+      - name: source
+        description: Data provider. Always "Yahoo Finance".
+      - name: _source
+        description: Always 'yahoo_finance'.
+      - name: _loaded_at
+        description: Timestamp when this dbt model was last run (UTC).
+
+  - name: stg_market_prices
+    description: >
+      Bronze layer for Yahoo Finance daily closing prices.
+      One row per (series_id, obs_date). Faithful copy of DB_TEAM_3.RAW.MARKET_PRICES
+      with audit columns added (_source, _loaded_at). No value transformations applied.
+      Covers 13 instruments from as early as 2000-01-03 through March 2026.
+      Weekends and market holidays are absent for exchange instruments;
+      crypto (BTC-USD, ETH-USD) has full calendar-day coverage.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        source: Yahoo Finance (yfinance)
+        layer: staging
+    columns:
+      - name: series_id
+        description: >
+          Yahoo Finance ticker symbol. Composite primary key with obs_date.
+          See stg_market_metadata for instrument descriptions.
+        data_tests:
+          - not_null
+      - name: obs_date
+        description: >
+          Trading date. Composite primary key with series_id.
+          No weekends or holidays for exchange instruments; crypto has all calendar days.
+        data_tests:
+          - not_null
+      - name: value
+        description: >
+          Adjusted closing price in USD (NUMBER(38,8)).
+          NULL indicates no data available for this date.
+      - name: _source
+        description: Always 'yahoo_finance'.
+      - name: _loaded_at
+        description: Timestamp when this dbt model was last run (UTC).

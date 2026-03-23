@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: mart_currency_environment
+    description: >
+      Latest EUR/FX exchange rate snapshot per currency pair with traffic-light signal.
+      Grain: one row per series_id. 30 ECB EUR/FX pairs.
+      signal_color: green = EUR strengthening, red = EUR weakening, yellow = stable.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        layer: marts
+        metrics:
+          count_eur_strengthening:
+            type: count
+            sql: "CASE WHEN ${TABLE}.trend_direction = 'EUR Strengthening' THEN ${TABLE}.series_id END"
+            label: "EUR Strengthening Pairs"
+            description: "Number of EUR/FX pairs where EUR is strengthening (YoY > +2%)"
+          count_eur_weakening:
+            type: count
+            sql: "CASE WHEN ${TABLE}.trend_direction = 'EUR Weakening' THEN ${TABLE}.series_id END"
+            label: "EUR Weakening Pairs"
+            description: "Number of EUR/FX pairs where EUR is weakening (YoY < -2%)"
+          count_stable_pairs:
+            type: count
+            sql: "CASE WHEN ${TABLE}.trend_direction = 'Stable' THEN ${TABLE}.series_id END"
+            label: "Stable EUR/FX Pairs"
+            description: "Number of EUR/FX pairs with stable trend"
+          avg_yoy_change:
+            type: average
+            sql: "${TABLE}.yoy_change_pct"
+            label: "Avg YoY Change (%)"
+            description: "Average year-over-year percentage change across all EUR/FX pairs"
+    columns:
+      - name: series_id
+        description: ECB series identifier. Primary key.
+        meta:
+          dimension:
+            type: string
+            label: "Currency Pair"
+        data_tests:
+          - not_null
+          - unique
+      - name: title
+        description: Human-readable series title from ECB metadata.
+        meta:
+          dimension:
+            type: string
+            label: "Pair Name"
+      - name: category
+        description: Currency pair category derived from ECB metadata.
+        meta:
+          dimension:
+            type: string
+            label: "Category"
+      - name: month_date
+        description: First day of the latest observation month.
+        meta:
+          dimension:
+            type: date
+            label: "Month"
+      - name: as_of_period
+        description: YYYY-MM label of the latest observation month.
+        data_tests:
+          - not_null
+      - name: value
+        description: EUR/FX exchange rate for the latest month.
+      - name: yoy_change_pct
+        description: Year-over-year percentage change in the exchange rate.
+      - name: trend_direction
+        description: Trend label — EUR Strengthening, EUR Weakening, or Stable.
+        meta:
+          dimension:
+            type: string
+            label: "EUR Trend"
+      - name: signal_color
+        description: Traffic light — green (EUR strengthening), yellow (stable), red (EUR weakening).
+        meta:
+          dimension:
+            type: string
+            label: "Signal"
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['green', 'yellow', 'red']
+      - name: _loaded_at
+        description: Timestamp when this row was last materialized.

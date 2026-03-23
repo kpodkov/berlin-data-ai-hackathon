@@ -3,12 +3,12 @@
 -- Splits December 2025 activity into early (Dec 1–14) vs recent (Dec 15–31) periods
 -- so that engagement drop can be detected for churn risk scoring.
 --
--- Used by: fct_user_segments
+-- Used by: mart_user_segments
 {{ config(materialized='table') }}
 
 with events as (
     select *
-    from {{ ref('base_events_t1') }}
+    from {{ ref('stg_events_t1') }}
     where user_id is not null
 ),
 

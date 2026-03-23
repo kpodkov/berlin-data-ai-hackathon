@@ -1,36 +1,54 @@
 version: 2
 
 models:
-  - name: stg_fred_timeseries
-    description: "FRED economic time series with topic classification. One row per series-date observation."
+  - name: stg_fred_observations
+    description: "FRED time series observations. One row per (series_id, obs_date)."
     columns:
       - name: series_id
-        description: "FRED series identifier"
+        data_tests: [not_null]
       - name: obs_date
-        description: "Observation date"
+        data_tests: [not_null]
       - name: value
-        description: "Observed value in native units"
-      - name: topic
-        description: "Personal finance topic: income, savings, debt, housing, cpi, rates, market, wealth, macro"
 
-  - name: stg_market_returns
-    description: "Daily market prices with returns and asset class labels. One row per ticker-date."
+  - name: stg_fred_series_metadata
+    description: "FRED series catalogue. One row per series_id."
     columns:
       - name: series_id
-        description: "Yahoo Finance ticker symbol"
-      - name: asset_class
-        description: "Asset class: equity, bond, commodity, crypto, real_estate, currency"
-      - name: daily_return
-        description: "Day-over-day return as decimal"
+        data_tests: [unique, not_null]
 
-  - name: stg_worldbank_countries
-    description: "World Bank indicators split by country. One row per indicator-country-year."
+  - name: stg_ecb_observations
+    description: "Pure source mirror of ECB monthly exchange rate observations. One row per (series_id, obs_date). 30 EUR/FX series from the European Central Bank."
     columns:
-      - name: indicator_code
-        description: "World Bank indicator code"
-      - name: country_code
-        description: "ISO3 country code"
-      - name: indicator_name
-        description: "Human-readable indicator name"
-      - name: country_name
-        description: "Human-readable country name"
+      - name: series_id
+        data_tests: [not_null]
+      - name: obs_date
+        data_tests: [not_null]
+      - name: value
+
+  - name: stg_ecb_metadata
+    description: "ECB series catalogue. One row per series_id. 30 EUR/FX exchange rate series."
+    columns:
+      - name: series_id
+        data_tests: [unique, not_null]
+
+  - name: stg_user_financial_profiles
+    description: "Pre-computed user financial profiles derived from JustWatch behavioral signals. One row per user_id. financial_score proxies wealth; tvod_propensity proxies discretionary spending willingness."
+    columns:
+      - name: user_id
+        data_tests: [not_null, unique]
+      - name: segment
+        data_tests: [not_null]
+      - name: financial_score
+
+  - name: stg_user_financial_advice
+    description: "AI-generated per-user financial advice. One row per user_id (subset of users who received personalised advice — ~50K rows)."
+    columns:
+      - name: user_id
+        data_tests: [not_null, unique]
+      - name: financial_advice
+
+  - name: stg_segment_intelligence
+    description: "Aggregated segment statistics with AI-generated insights. One row per segment (10 rows)."
+    columns:
+      - name: segment
+        data_tests: [not_null, unique]
