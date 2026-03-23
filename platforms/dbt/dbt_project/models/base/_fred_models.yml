@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: base_fred_series_metadata
+    description: >
+      Bronze layer for FRED series catalogue.
+      One row per series_id. Faithful copy of DB_TEAM_3.RAW.FRED_SERIES_METADATA
+      with audit columns added (_source, _loaded_at) and last_updated cast to TIMESTAMP_NTZ.
+      31 macro series covering GDP, inflation, unemployment, rates, savings, debt,
+      volatility, and equity markets.
+      Join to base_fred_observations on series_id to enrich observations with descriptions.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        source: Federal Reserve Bank of St. Louis (FRED API)
+        layer: bronze
+    columns:
+      - name: series_id
+        description: >
+          FRED series identifier. Primary key.
+          Known values for dashboard: GDPC1, CPIAUCSL, UNRATE, FEDFUNDS,
+          DGS10, PSAVERT, TDSP, VIXCLS, SP500.
+        data_tests:
+          - not_null
+          - unique
+      - name: title
+        description: Human-readable series name (e.g. "Real Gross Domestic Product").
+      - name: units
+        description: Unit of measurement (e.g. "Billions of Chained 2017 Dollars", "Percent").
+      - name: frequency
+        description: Observation frequency — Daily, Monthly, Quarterly, or Annual.
+      - name: seasonal_adjustment
+        description: Seasonal adjustment status from FRED metadata.
+      - name: last_updated_at
+        description: Timestamp of the most recent FRED update for this series (TIMESTAMP_NTZ).
+      - name: category
+        description: >
+          Human-readable category label assigned during ingestion
+          (e.g. "Real GDP (quarterly)", "Unemployment Rate").
+      - name: _source
+        description: Always 'fred'.
+      - name: _loaded_at
+        description: Timestamp when this dbt model was last run (UTC).
+
+  - name: base_fred_observations
+    description: >
+      Bronze layer for FRED time series observations.
+      One row per (series_id, obs_date). Faithful copy of DB_TEAM_3.RAW.FRED_OBSERVATIONS
+      with audit columns added (_source, _loaded_at). No value transformations applied.
+      ~48.5K rows across 31 series.
+      Missing FRED values (original "." string) are stored as NULL in the source and
+      preserved as NULL here.
+    config:
+      meta:
+        contains_pii: no
+        owner: "@team-3"
+        source: Federal Reserve Bank of St. Louis (FRED API)
+        layer: bronze
+    columns:
+      - name: series_id
+        description: >
+          FRED series identifier. Composite primary key with obs_date.
+          See base_fred_series_metadata for series descriptions.
+        data_tests:
+          - not_null
+      - name: obs_date
+        description: >
+          Observation date. Composite primary key with series_id.
+          Frequency varies by series — daily (DGS10, VIXCLS, SP500),
+          monthly (CPIAUCSL, UNRATE, FEDFUNDS, PSAVERT), or quarterly (GDPC1, TDSP).
+        data_tests:
+          - not_null
+      - name: value
+        description: >
+          Observed numeric value in the series' native units (NUMBER(38,8)).
+          NULL indicates a missing or suppressed FRED observation.
+      - name: _source
+        description: Always 'fred'.
+      - name: _loaded_at
+        description: Timestamp when this dbt model was last run (UTC).

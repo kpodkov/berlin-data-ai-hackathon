@@ -7,6 +7,7 @@ sources:
     tables:
 
       - name: MARKET_METADATA
+        identifier: YAHOO_METADATA
         description: >
           Metadata catalogue for financial market series ingested into DB_TEAM_3.RAW.MARKET_PRICES.
           One row per series_id. Source: Yahoo Finance via yfinance Python library.
@@ -35,6 +36,7 @@ sources:
             description: Data provider. Always "Yahoo Finance".
 
       - name: MARKET_PRICES
+        identifier: YAHOO_OBSERVATIONS
         description: >
           Daily closing price time series for 13 financial market instruments sourced from Yahoo Finance.
           One row per (series_id, obs_date). Values represent adjusted closing prices in USD.

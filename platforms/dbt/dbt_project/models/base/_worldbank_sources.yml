@@ -42,6 +42,7 @@ sources:
             description: Data provider. Always "World Bank".
 
       - name: WORLDBANK_INDICATORS
+        identifier: WORLDBANK_OBSERVATIONS
         description: >
           Annual socioeconomic time series for 15 countries sourced from the World Bank Open Data API.
           One row per (series_id, obs_date). Each series_id encodes both the indicator and country.

@@ -8,12 +8,16 @@ sources:
       - name: FRED_OBSERVATIONS
         description: "FRED time series observations (31 series, 48.5K rows)"
       - name: FRED_SERIES_METADATA
+        identifier: FRED_METADATA
         description: "FRED series metadata (title, units, frequency)"
       - name: MARKET_PRICES
+        identifier: YAHOO_OBSERVATIONS
         description: "Yahoo Finance daily closing prices (13 tickers, 71.6K rows)"
       - name: MARKET_METADATA
+        identifier: YAHOO_METADATA
         description: "Yahoo Finance ticker metadata"
       - name: WORLDBANK_INDICATORS
+        identifier: WORLDBANK_OBSERVATIONS
         description: "World Bank development indicators (15 countries, 10 indicators)"
       - name: WORLDBANK_METADATA
         description: "World Bank indicator metadata"

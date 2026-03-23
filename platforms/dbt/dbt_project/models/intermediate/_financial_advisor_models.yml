@@ -27,7 +27,7 @@ models:
       - name: last_obs_date
         description: Actual date of the last raw observation used (meaningful for daily series).
       - name: value
-        description: Latest monthly value. Units vary by series — see base_fred_series_metadata.
+        description: Latest monthly value. Units vary by series — see stg_fred_series_metadata.
       - name: value_12m_ago
         description: Value 12 monthly observations prior. Null if history is insufficient.
       - name: yoy_change_pct
@@ -65,7 +65,7 @@ models:
         data_tests:
           - not_null
       - name: title
-        description: Human-readable series name from base_fred_series_metadata.
+        description: Human-readable series name from stg_fred_series_metadata.
       - name: units
         description: Units of the value column for this series.
       - name: frequency
@@ -144,13 +144,13 @@ models:
         data_tests:
           - not_null
       - name: title
-        description: Human-readable series name from base_fred_series_metadata.
+        description: Human-readable series name from stg_fred_series_metadata.
       - name: units
         description: Units of the value column for this series.
       - name: frequency
         description: Original FRED frequency (before monthly normalization).
       - name: category
-        description: Category label from base_fred_series_metadata (e.g. 'Real GDP (quarterly)').
+        description: Category label from stg_fred_series_metadata (e.g. 'Real GDP (quarterly)').
       - name: value
         description: Monthly value (last observation in month for daily series).
       - name: value_12m_ago
